@@ -1,7 +1,13 @@
+# Project specific files (Sander)
+loraplan/scratchpad.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Misc
+**/.DS_Store
 
 # C extensions
 *.so
