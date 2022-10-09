@@ -12,10 +12,10 @@ Subpackages
 Submodules
 ----------
 
-loraplan.example module
------------------------
+loraplan.models module
+----------------------
 
-.. automodule:: loraplan.example
+.. automodule:: loraplan.models
    :members:
    :undoc-members:
    :show-inheritance:
