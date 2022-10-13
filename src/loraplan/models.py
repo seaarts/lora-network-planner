@@ -4,16 +4,16 @@ from scipy.spatial import distance_matrix
 
 
 
+
 #=========================================================
 #        LoRa / LoRaWAN utilities
 #=========================================================
-
 
 def airtime(payloadSize, sf, bw=125, codingRate='4/5',
             lowDrOptimize=False, explicitHeader=True,
             preambleLength=8):
     """
-    Calculate the LoRa airtime in milliseconds.
+    Airtime of LoRa transmission in milliseconds.
 
 
     Parameters
@@ -125,14 +125,14 @@ def airtime(payloadSize, sf, bw=125, codingRate='4/5',
 
 
 
-#=========================================================
-#        Modeling Wireless Traffic
-#=========================================================
 
+#=========================================================
+#        Wireless Traffic
+#=========================================================
 
 class Traffic():
     """
-    A collcetions of LoRa wireless traffic.
+    A collcetion of LoRa wireless traffic.
     
     Attributes
     ----------
@@ -202,217 +202,140 @@ class Traffic():
         self.sf = sf
         self.power = power
     
-    
     def __repr__(self):
         # WANT: Reference to the distribution that generated it.
         
         return f"Traffic(nPackets={self.nObs})"
+    
+    def to_numpy(self, copy=False):
+        """
+        A NumPy ndarray representing the stored data.
+        
+        Parameters
+        ----------
+        copy : bool, optional
+            Whether data is explicitly copied or possibly
+            a view to arrays stored in instance. Default False.
+        
+        Returns
+        -------
+        np.ndarray
+        """
+
+        result = np.zeros(shape=(self.nObs, 5))
+        
+        
+        for i, vals in enumerate(self.__dict__.values()):
+            if i > 0:
+                result[:, i-1] = vals
+        
+        if copy:
+            return result.copy()
+        
+        return result
+        
+        
+        
+    
+#=========================================================
+#        Networks
+#=========================================================
+    
+class LoRaWAN():
+    """
+    A LoRaWAN (network) object class that tracks essential
+    wireless parameters.
+
+    Attributes
+    ---------
+    nChannels : int
+        Number of channels permitted.
+
+    freq : float
+        (Central) frequency used by network.
+
+    bandwidth : float
+        Bandwidth of uplink channel.
+
+    spreadingFactors : list of int
+        List of spreading factors allowed on network.
+
+    overhead : int
+        Number of bytes of overhead in payload.
+
+    dwellTime : float
+        Maximum permitted dwell time in ms. Use `None` if not restricted.
+
+    dutyCycle : float
+        Maximum duty cycle permitted. Use `None` if not resttrictred.
+        
+
+    Notes
+    -----
+    
+    FUTURE - would be nice to read data from e.g.
+        https://github.com/TheThingsNetwork/lorawan-frequency-plans
+
+    For now parameters are specified manually.
+
+    Defaults are for North America ISM band.
+    """
+
+    def __init__(self, nChannels=1, freq=915, bandwidth=125,
+                 spreading=None, overhead=13,
+                 dwellTime=400, dutyCycle=None):
+        """
+        Instantiate LoRaWAN instance.
+
+        Parameters
+        ----------
+        nChannels : int
+            Number of channels permitted.
+
+        freq : float
+            (Central) frequency used by network.
+
+        bandwidth : float
+            Bandwidth of uplink channel.
+
+        spreadingFactors : list of int
+            List of spreading factors allowed on network.
+
+        overhead : int
+            Number of bytes of overhead in payload.
+
+        dwellTime : float
+            Maximum permitted dwell time in ms. Use `None` if not restricted.
+
+        dutyCycle : float
+            Maximum duty cycle permitted. Use `None` if not resttrictred.
+        """
+        
+        if spreading is None:
+            spreading = [7, 8, 9, 10]
+
+        self.nChannels = nChannels
+        self.freq = freq
+        self.bw = bandwidth
+        self.sf = spreading
+        self.overhead = overhead
+        self.dwellTime = dwellTime
+        self.dutyCycle = dutyCycle
+
+    def __repr__(self):
+        return "LoRaWAN(%r)" % self.__dict__
+
+    def __str__(self):
+        out = "A LoRaWAN object with params:"
+        for k, v in self.__dict__.items():
+            out += f"\n\t {k}: {v}"
+        return out
+
+
 
 
 #=========================================================
-#        Simulation tools and utilities
+#        Data-generating Processes
 #=========================================================
 
 
-class TimeWindow():
-    """A time interval.
-    
-    Attributes
-    ----------
-    tMin : float
-        The left-hand end point of the time interval.
-    tMax : float
-        The right-hand end point of the time interval.
-    buff : float
-        Number of time units by which to buffer the interval
-        in both left and right directions.
-        
-    """
-    
-    def __init__(self, tMin, tMax, buffer=0):
-        """Specify a time-window by start and end points.
-        
-        Parameters
-        ----------
-        tMin : float
-            The left-hand end point of the time interval.
-        tMax : float
-            The right-hand end point of the time interval.
-        buff : float, optional
-            Number of time units by which to buffer the interval
-            in both left and right directions. Default 0.
-            
-        Raises
-        ------
-        ValueError
-            If right hand end-point smaller than left-hand one.
-        """
-        
-        if tMin >= tMax:
-            
-            raise ValueError("Init failed. tMin >= tMax.")
-            
-        
-        self.tMin = tMin
-        self.tMax = tMax
-        self.buff = buffer
-        
-    def __repr__(self):
-        return f"TimeWindow({self.tMin}, {self.tMax}, buffer={self.buff})"
-    
-    @property
-    def length(self):
-        """
-        Length of TimeWindow including buffers.
-        """
-        
-        return self.tMax - self.tMin + 2*self.buff
-    
-    
-    def contains(self, x):
-        """
-        Check whether time window contains given point.
-        
-        Parameters
-        ----------
-        x : float or array_like
-            Position of a point on real line.
-            
-        Returns
-        -------
-        contains : bool
-            Indicates whether x in contained in TimeWindow
-        """
-        
-        return (self.tMin <= x) * (x <= self.tMax)
-   
-    
-    def uniform(self, size=None, seed=None):
-        """
-        Sample points uniformly over buffered time window.
-        
-        Parameters
-        ----------
-        size : int or tuple of ints, optional
-            Shape of uniform random vector.
-            Passed to `np.random.unfiorm()`
-        seed : int, optional
-            Seed passed to `np.random.default_rng()`.
-            
-        Returns
-        -------
-        u : ndarray or scalar
-            
-        """
-        
-        rng = np.random.default_rng(seed=seed)
-        
-        low = self.tMin - self.buff
-        high = self.tMax + self.buff
-        
-        return rng.uniform(low=low, high=high, size=size)
-    
-    
-class ArrivalProcess(ABC):
-    """Stochastic arrival process on TimeWindow"""
-    
-    def __init__(self):
-        """
-        Instantiate arrival process.
-        """
-    
-    @abstractmethod
-    def sample(self):
-        pass
-    
-
-class PoissonProcess(ArrivalProcess):
-    """Homogeneous Poisson arrival processes
-    
-    
-    Attributes
-    ----------
-    rate : float
-        Poisson arrival rate.
-    """
-    
-    def __init__(self, TimeWindow, rate=None):
-        """Instantiate homogeneous Poisson process.
-        
-        Parameters
-        ----------
-        timeWindow : timeWindow
-             Time window over which to simulate process.
-        
-        rate : float
-             Poisson arrival rate.
-             
-             
-        """
-        super().__init__()
-        self.timeWindow = TimeWindow
-        self.rate = rate
-        
-    def __repr__(self):
-        return f"HomogeneousPoissonProcess({self.timeWindow}, rate={self.rate})"
-        
-    def sample(self, size=None, rate=None, seed=None, stream=None):
-        """
-        Sample Poisson process over TimeWindow.
-        
-        Parameters
-        ----------
-        
-        rate : float, optional
-            Poisson arrival rate. May be `None` if stored in `ArrivalProcess.rate`.
-        
-        size : int, optional
-            The number of samples to be taken. Limited to integer
-            rather than tuples, because each sample may vary in
-            size. Default 1.
-            
-        stream : list of np.random.generators, optional
-            List of generators for the individual Process samples.
-            Passed as seeds to to TimeWindow.sample(). This enables
-            the use of Common Random Numbers in placing the points,
-            when e.g. the arrival rates are varied over multiple
-            experiments. Default `None`.
-            
-            
-        Returns
-        -------
-        samples : list of ndarrays
-            The length of `samples` is `size`.
-            
-            
-        Raises
-        ------
-        ValueError
-            If `self.rate` and `rate` are `None`.
-        """
-        
-        rng = np.random.default_rng(seed=seed)
-           
-        
-        if not rate and self.rate:
-            rate = self.rate
-        else:
-            raise ValueError("""No rate given. Try passing`rate=1.0`,\
- or set a rate for the ArrivalProcess."""
-                            )
-       
-        if size is None:
-            size = 1
-    
-        if stream is None:
-            stream = [rng for i in range(size)]  # pointers to same rng
-        
-        
-        window = self.timeWindow
-        
-        mu = window.length * rate
-        
-        nPoints = np.random.poisson(mu, size=size)
-        
-        
-        return [window.uniform(nPoints[i], seed=stream[i]) for i in range(size)]

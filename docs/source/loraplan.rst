@@ -20,6 +20,22 @@ loraplan.models module
    :undoc-members:
    :show-inheritance:
 
+loraplan.points module
+----------------------
+
+.. automodule:: loraplan.points
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+loraplan.propagation module
+---------------------------
+
+.. automodule:: loraplan.propagation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
