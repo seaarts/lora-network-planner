@@ -1,5 +1,5 @@
-src
-===
+loraplan
+========
 
 .. toctree::
    :maxdepth: 4

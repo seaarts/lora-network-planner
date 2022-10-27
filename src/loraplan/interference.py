@@ -1,13 +1,23 @@
+"""
+The ``interference`` module contains tools for modeling wireless interference.
+
+A central object is a (LoRa) ``Traffic`` object. This represents a collection
+of LoRa transmissions observed within a specified ``TimeWindow``. To study interference
+two additional concepts are required. First is a ``TrafficGenerator`` that can
+randomly sample ``Traffic`` objects from some specified distribution.
+Non-stochastic generators are also supported, such as e.g. models in which
+devices tramsit at regular intervals or with fixed parameters. Second, ``Traffic``
+should be classified into successfull or failed, depending on the degree of
+interference. We use a ``CollisionModel`` class that takes ``Traffic``-objects
+and assigns labels to each transmission.
+"""
+
 import numpy as np
 from abc import ABC, abstractmethod
 from scipy.spatial import distance_matrix
 
 
 
-
-#=========================================================
-#        LoRa / LoRaWAN utilities
-#=========================================================
 
 def airtime(payloadSize, sf, bw=125, codingRate='4/5',
             lowDrOptimize=False, explicitHeader=True,
@@ -163,8 +173,8 @@ class Traffic():
     thereof are mandatory.
     
     More variables may be added. The main idea is that any
-    CollisionModel can process LoRaTraffic instances and form
-    predictions over successful receptions.
+    ``CollisionModel`` can process ``Traffic``-objects
+    to form predictions over successful receptions.
     """
 
     def __init__(self, nPackets, start, airtime,
@@ -332,10 +342,5 @@ class LoRaWAN():
         return out
 
 
-
-
-#=========================================================
-#        Data-generating Processes
-#=========================================================
 
 

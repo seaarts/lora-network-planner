@@ -1,11 +1,27 @@
+"""
+The ``distributions``-module contains simple simulation models and utilities.
+
+Simulation, and point processes in particular, play a central role in
+studying wireless networks. Variables such as device locations in space
+and transmission times in time are often modeled as `point processes
+<https://en.wikipedia.org/wiki/Point_process>`_.
+This package implements point processes through a ``SpatialDomain``-class.
+The domain represents a finite observable windown, such as a study-area
+on a map, or a finite window in time. Each domain must implements its own
+method for sampling a homogeneous
+`Poisson process <https://en.wikipedia.org/wiki/Poisson_point_process>`_;
+more advanced processes are implemented on the ``SpatialDomain``-level.
+"""
+
+
 import numpy as np
 from abc import ABC, abstractmethod
 import collections.abc
 import warnings
 
 from scipy.stats import norm
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.metrics.pairwise import euclidean_distances
+#from sklearn.gaussian_process import GaussianProcessRegressor
+#from sklearn.metrics.pairwise import euclidean_distances
 
 
 
@@ -152,11 +168,15 @@ class Rectangle(SpatialDomain):
         
     @property
     def width(self):
+        """Width of rectangle.
+        """
         (left, bottom, right, top) = self.bbox
         return right - left
     
     @property
     def height(self):
+        """Height of rectangle.
+        """
         (left, bottom, right, top) = self.bbox
         return top - bottom
     
@@ -168,7 +188,7 @@ class Rectangle(SpatialDomain):
     
     @property
     def measure(self):
-        """Get the area.
+        """Lebesque measure of rectangle (area).
         """
         return self.area
     
@@ -277,7 +297,6 @@ class TimeWindow(SpatialDomain):
         """
         return self.length
     
-    
     def contains(self, x):
         """
         Check whether time window contains given point.
@@ -294,7 +313,6 @@ class TimeWindow(SpatialDomain):
         """
         
         return (self.tMin <= x) * (x <= self.tMax)
-   
     
     def uniform(self, size=None, seed=None):
         """
@@ -322,6 +340,14 @@ class TimeWindow(SpatialDomain):
         return rng.uniform(low=low, high=high, size=size) 
     
     def poisson(self, intensity, seed=None):
+        """Sample homogeneous poisson process over window.
+        
+        Parameters
+        ----------
+        intensity : float
+            Intensity or arrival rate.
+        seed : optional
+        """
         rng = np.random.default_rng(seed)
         
         nPoints = rng.poisson(self.measure * intensity)
@@ -330,8 +356,14 @@ class TimeWindow(SpatialDomain):
     
 
 
+    
 class ArrivalProcess(ABC):
-    """Stochastic arrival process on TimeWindow"""
+    """Stochastic arrival process on TimeWindow.
+    
+    Notes
+    -----
+    Should support richer distirbutions than Poisson, e.g. spatial models with duty cycles.
+    """
     
     def __init__(self):
         """
@@ -343,7 +375,7 @@ class ArrivalProcess(ABC):
         pass
     
 
-class PoissonProcess(ArrivalProcess):
+class PoissonArrivals(ArrivalProcess):
     """Homogeneous Poisson arrival processes
     
     
@@ -371,7 +403,7 @@ class PoissonProcess(ArrivalProcess):
         self.rate = rate
         
     def __repr__(self):
-        return f"HomogeneousPoissonProcess({self.timeWindow}, rate={self.rate})"
+        return f"HomogeneousPoissonArrivals({self.timeWindow}, rate={self.rate})"
         
     def sample(self, size=None, rate=None, seed=None, stream=None):
         """

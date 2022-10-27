@@ -1,29 +1,28 @@
 loraplan package
 ================
 
-Subpackages
------------
+The ``loraplan`` package consists of a number of modules.
 
-.. toctree::
-   :maxdepth: 4
+loraplan.algorithms module
+--------------------------
 
-   loraplan.interference
-
-Submodules
-----------
-
-loraplan.models module
-----------------------
-
-.. automodule:: loraplan.models
+.. automodule:: loraplan.algorithms
    :members:
    :undoc-members:
    :show-inheritance:
 
-loraplan.points module
-----------------------
+loraplan.interference module
+----------------------------
 
-.. automodule:: loraplan.points
+.. automodule:: loraplan.interference
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+loraplan.planning module
+------------------------
+
+.. automodule:: loraplan.planning
    :members:
    :undoc-members:
    :show-inheritance:
@@ -32,6 +31,14 @@ loraplan.propagation module
 ---------------------------
 
 .. automodule:: loraplan.propagation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+loraplan.simulation module
+--------------------------
+
+.. automodule:: loraplan.simulation
    :members:
    :undoc-members:
    :show-inheritance:

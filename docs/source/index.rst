@@ -6,12 +6,37 @@
 Welcome to loraplan's documentation!
 ====================================
 
+
+The package loraplan collects tools for LoRa network planning. Written by Sander Aarts (2022).
+
+There are five  main components; planning, interference, propagation, algotithms, and simulation.
+
+
+Planning
+--------
+
+
+Interference
+------------
+
+
+Propagation
+-----------
+
+
+Algorithms
+----------
+
+
+Simulation
+----------
+
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 3
+   :caption: Package contents
 
    modules
-
 
 
 Indices and tables

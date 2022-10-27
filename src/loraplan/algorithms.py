@@ -1,5 +1,10 @@
 """
-Algorithms for solving covering integer programs.
+A collections of algorithms for covering integer programs.
+
+Currenlty implemented are:
+- A Greedy algorithm
+- A Primal-Dual algorithm
+
 """
 
 #from ortools.linear_solver import pywraplp
