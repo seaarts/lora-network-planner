@@ -96,6 +96,8 @@ def airtime(payloadSize, sf, bw=125, codingRate='4/5',
     For use in LoRaWAN, it seems a +13 to payloadSize is needed.
     This mathces our values with the airtime-calculator.
     
+    References
+    ----------
     .. [1] A. V. Bentem. "Airtime-calculator". Available at https://github.com/avbentem/airtime-calculator
     
     """
@@ -213,9 +215,11 @@ class Traffic():
         self.power = power
     
     def __repr__(self):
-        # WANT: Reference to the distribution that generated it.
-        
-        return f"Traffic(nPackets={self.nObs})"
+        return f"Traffic({self.__dict__})"
+    
+    def __str__(self):
+        nObs = self.nObs
+        return f"Traffic({nObs=})"
     
     def to_numpy(self, copy=False):
         """
@@ -248,13 +252,12 @@ class Traffic():
         
     
 #=========================================================
-#        Networks
+#        LoRaParameters-object
 #=========================================================
     
-class LoRaWAN():
+class LoRaParameters():
     """
-    A LoRaWAN (network) object class that tracks essential
-    wireless parameters.
+    An object class for LoRa Network Parameters.
 
     Attributes
     ---------
@@ -272,6 +275,9 @@ class LoRaWAN():
 
     overhead : int
         Number of bytes of overhead in payload.
+        
+    maxPow : float
+        Maximum transmitted power (dBm). 
 
     dwellTime : float
         Maximum permitted dwell time in ms. Use `None` if not restricted.
@@ -292,10 +298,10 @@ class LoRaWAN():
     """
 
     def __init__(self, nChannels=1, freq=915, bandwidth=125,
-                 spreading=None, overhead=13,
+                 spreading=None, overhead=13, maxPow=30,
                  dwellTime=400, dutyCycle=None):
         """
-        Instantiate LoRaWAN instance.
+        Instantiate LoRaParemeters instance.
 
         Parameters
         ----------
@@ -313,6 +319,9 @@ class LoRaWAN():
 
         overhead : int
             Number of bytes of overhead in payload.
+        
+        maxPow : float
+            Maximum transmitted power (dBm).
 
         dwellTime : float
             Maximum permitted dwell time in ms. Use `None` if not restricted.
@@ -329,18 +338,18 @@ class LoRaWAN():
         self.bw = bandwidth
         self.sf = spreading
         self.overhead = overhead
+        self.maxPow = maxPow
         self.dwellTime = dwellTime
         self.dutyCycle = dutyCycle
 
     def __repr__(self):
-        return "LoRaWAN(%r)" % self.__dict__
+        return "LoRaParameters(%r)" % self.__dict__
 
     def __str__(self):
-        out = "A LoRaWAN object with params:"
+        out = "A LoRa Parameters object with params:"
         for k, v in self.__dict__.items():
             out += f"\n\t {k}: {v}"
         return out
+    
 
-
-
-
+    

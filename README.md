@@ -15,3 +15,9 @@ LoRa network planning utilities and tools in python.
 Use `sphinx` to generate documentation. I prefer `NumPy` style - see [styleguide](https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard). For a gentle tutorial on `sphinx` see [shunsvineyard](https://shunsvineyard.info/2019/09/19/use-sphinx-for-python-documentation/).
 
 Use `sphinx-apidoc -f -o source ../src/loraplan/` in `docs` to make `.rst` docfiles. Then use `make html` to refresh your docs.
+
+
+## See notes on using Colab and github
+Check out this [Colab demo](https://colab.research.google.com/github/googlecolab/colabtools/blob/master/notebooks/colab-github-demo.ipynb#scrollTo=3VQqVi-3ScBC).
+
+It seems possible to maintain a folder of noteoboks, and to create a link that opens a notebook in colab.

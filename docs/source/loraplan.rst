@@ -1,12 +1,19 @@
 loraplan package
 ================
 
-The ``loraplan`` package consists of a number of modules.
 
 loraplan.algorithms module
 --------------------------
 
 .. automodule:: loraplan.algorithms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+loraplan.distributions module
+-----------------------------
+
+.. automodule:: loraplan.distributions
    :members:
    :undoc-members:
    :show-inheritance:
@@ -31,14 +38,6 @@ loraplan.propagation module
 ---------------------------
 
 .. automodule:: loraplan.propagation
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-loraplan.simulation module
---------------------------
-
-.. automodule:: loraplan.simulation
    :members:
    :undoc-members:
    :show-inheritance:

@@ -28,8 +28,8 @@ Algorithms
 ----------
 
 
-Simulation
-----------
+Distributions
+-------------
 
 
 .. toctree::
