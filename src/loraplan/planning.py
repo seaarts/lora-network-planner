@@ -1,3 +1,8 @@
+"""
+The ``planning`` submodule makes high-level network planning simple.
+
+"""
+
 from abc import ABC, abstractmethod
 
 class Demands:
@@ -6,8 +11,22 @@ class Demands:
     
     def __init__(self, locs, reqs):
         """ Initialize class.
-        ::param locs:: location coordinates of points (numpy.array)
-        ::param reqs:: requirement vector (numpy.array)
+        
+        Parameters
+        ----------
+        locs : array of floats
+            Locations of demand points
+        reqs : array of floats
+            Service requirements of demand points
+            
+        Raises
+        ------
+        ValueError
+            If requirements are not 1-dimensional.
+        ValueError
+            If number of locs does nod match the number of reqs.
+        ValueError
+            If locations do not have 2 columns.
         """
 
         # verify locations
@@ -107,23 +126,39 @@ class ConnectionQuality(ABC):
     
 class LogErrorRate(ConnectionQuality):
     """
-    Negatie log error rate quality model.
+    Negative log error rate quality model.
     
-    This class of quality model combines path loss and iid gaussian noice:
-        1. demands have fixed transmitted power (p_tx)
-        2. a path loss model determines path loss (PL)
-        3. iid (0, sigma) gaussian noise sampled
-        4. received power (p_rx) follows from the link-budget:
-            
-            p_rx = p_tx - PL + noise
-            
-        5. a transmission is received iff minimum power (p_min) exceeded
+    This class of quality model combines path loss and iid gaussian noice.
         
-        The probabiliy of success is expressed analytically as
+    .. hlist::
+        :columns: 1
     
-            P[fail] = P[p_tw - PL + noise <= p_min ]
-                    = P[noise <= p_min - p_tx + PL ]
-                    = normal.cdf(p_min - p_tw + PL)
+        * Demands have fixed transmitted power (:math:`p_{tx}`)
+        * A path loss model determines path loss (PL)
+        * :math:`\epsilon \sim \mathcal{N}(0, \sigma)` noise sampled iid
+        * Received power (:math:`p_rx`) follows from the link-budget
+    
+            .. math:: p_{rx} = p_{tx} - PL + \epsilon
+            
+        * A transmission is received iff minimum power (:math:`p_{min}`) exceeded
+    
+    The probabiliy of success is expressed analytically as
+    
+    .. math::
+    
+        P[fail] = P[ \ p_{tw} - PL + noise \leq p_{min}]
+                = P[\epsilon \leq p_{min} - p_{tx} + PL ]
+    
+    
+    Where the probability of the failure is given by a Normal CDF :math:`\Phi`.
+    
+    .. math::
+    
+        P[\epsilon \leq p_{min} - p_{tx} + PL ] = \Phi(p_{min} - p_{tw} + PL)
+    
+    
+    This gives a closed-form expression for the packet error rate.
+    
     """
     
     def __init__(self, path_loss, p_tx, p_min, stdv):

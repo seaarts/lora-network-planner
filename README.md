@@ -17,6 +17,9 @@ Use `sphinx` to generate documentation. I prefer `NumPy` style - see [styleguide
 Use `sphinx-apidoc -f -o source ../src/loraplan/` in `docs` to make `.rst` docfiles. Then use `make html` to refresh your docs.
 
 
+See the `sphinx-proofs` extension that you may want for fun. [Link](https://github.com/executablebooks/sphinx-proof)
+
+
 ## See notes on using Colab and github
 Check out this [Colab demo](https://colab.research.google.com/github/googlecolab/colabtools/blob/master/notebooks/colab-github-demo.ipynb#scrollTo=3VQqVi-3ScBC).
 
