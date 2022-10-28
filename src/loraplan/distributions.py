@@ -465,3 +465,83 @@ class PoissonArrivals(ArrivalProcess):
         
         
         return [window.uniform(nPoints[i], seed=stream[i]) for i in range(size)]
+
+    
+    
+    
+#=========================================================
+#        Distributions
+#=========================================================
+    
+class Distribution(ABC):
+    """
+    Class for custom made probability distributions.
+    
+    Allows attaching parameters and a seed to the distribution instance
+    so as to streamline object compositions using ``Distribution``-objects.
+    
+    Notes
+    -----
+    The `__call__` function is used for sampling.
+    The parameters and defaults should be explicit.
+    Each distribution uses a `numpy.random.generator`,
+    and should accept and optional `seed` to which
+    a `seed` string or a `numpy.random.generator` can be
+    passed.
+    
+    """
+    
+    @classmethod
+    def __call__(self):
+        pass
+
+
+class Normal(Distribution):
+    """A normal distribution.
+    """
+    
+    def __init__(self, loc=0, scale=1, seed=None):
+        """Instantiate normal distribution.
+        """
+        self.loc = loc
+        self.scale = scale
+        self.seed = seed
+        
+    def __repr__(self):
+        return "Normal(%s)" % str(self.__dict__) 
+        
+    def __call__(self, *, loc=None, scale=None, size=None, seed=None):
+        """
+        Sample of independent univariate normal random variables.
+        
+        Parameters
+        ----------
+        
+        loc : float or array_like
+            Location parameter(s)
+        scale : float or array_like
+            Scale parameter(s)
+        size : int or tuple of ints
+            Size of sample
+        seed : int, optional
+            A seed to override the Distribution's internal seed.
+        
+        Returns
+        -------
+        A normal sample of given size.
+            
+        See Also
+        --------
+        numpy.random.normal
+        """ 
+        if loc is None:
+            loc = self.loc
+        if scale is None:
+            scale = self.scale
+        
+        # override self.seed if provided
+        if not seed:
+            seed = self.seed
+        rng = np.random.default_rng(seed)
+        
+        return rng.normal(loc=loc, scale=scale, size=size)
