@@ -610,3 +610,58 @@ class Choice(Distribution):
         rng = np.random.default_rng(seed)
         
         return rng.choice(size=size, a=a, p=p, replace=replace)
+    
+    
+class Uniform(Distribution):
+    """A uniform distribution.
+    
+    Methods
+    -------
+    """
+    
+    def __init__(self, low=0.0, high=1.0, seed=None):
+        """Instantiate finite discrete distribution.
+        """
+        if low > high:
+            raise ValueError("`low` cannot exceed high.")
+            
+        self.low = low
+        self.high = high
+        self.seed = seed
+        
+    def __repr__(self):
+        return "UniformDistribution(%s)" % str(self.__dict__) 
+        
+    def sample(self, size=None, *, low=None, high=None, seed=None):
+        """
+        Sample of independent univariate normal random variables.
+        
+        Parameters
+        ----------
+        
+        low : array_like, float
+            Lower bounds for uniform distribution.
+        high : array_like, float
+            Upper bounds for uniform distribution.
+        seed : int, optional
+            Overrides Distribution's internal seed.
+        
+        Returns
+        -------
+        A sample of given size.
+            
+        See Also
+        --------
+        ``numpy.random.Generator.uniform`` in NumPy's `documentation <https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.uniform.html>`_.
+        """ 
+        if low is None:
+            low = self.low
+        if high is None:
+            high = self.high
+        
+        # override self.seed if provided
+        if not seed:
+            seed = self.seed
+        rng = np.random.default_rng(seed)
+        
+        return rng.uniform(size=size, low=low, high=high)
