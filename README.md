@@ -1,4 +1,5 @@
-# lora-network-planner
+# lorapla: LoRa Network Planing tools
+
 LoRa network planning utilities and tools in python.
 
 

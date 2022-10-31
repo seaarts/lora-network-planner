@@ -236,8 +236,6 @@ class Rectangle(SpatialDomain):
 
 
 
-
-
 class TimeWindow(SpatialDomain):
     """A time interval.
     
