@@ -383,7 +383,7 @@ class PoissonArrivals(ArrivalProcess):
         Poisson arrival rate.
     """
     
-    def __init__(self, TimeWindow, rate=None):
+    def __init__(self, timeWindow, rate=None):
         """Instantiate homogeneous Poisson process.
         
         Parameters
@@ -397,7 +397,7 @@ class PoissonArrivals(ArrivalProcess):
              
         """
         super().__init__()
-        self.timeWindow = TimeWindow
+        self.timeWindow = timeWindow
         self.rate = rate
         
     def __repr__(self):
@@ -487,13 +487,13 @@ class Distribution(ABC):
     
     """
     @classmethod
-    def sample(self):
+    def sample(self, size=None, **kwargs):
         pass
     
-    def __call__(self, size=None):
+    def __call__(self, size=None, **kwargs):
         """Sample distribution
         """
-        return self.sample(size)
+        return self.sample(size=size, **kwargs)
 
 
 class Normal(Distribution):
