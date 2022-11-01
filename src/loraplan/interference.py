@@ -254,11 +254,7 @@ class Traffic():
     
     def to_dict(self):
         """
-        Return stored data as a dictionary.
-        
-        Notes
-        -----
-        Trivial but slightly more "readable" that __dict__.
+        Return Traffic data as a dictionary. Equivalent to ``__dict__``.
         """
         
         return self.__dict__
@@ -270,14 +266,13 @@ class Traffic():
         Parameters
         ----------
         y_variable : str, optional
-            The variable in Traffic.to_dict() to be used as y-axis location.
-            The default ``'index`` places each packet on its own y-position.
+            The variable in ``Traffic.to_dict()`` to be used as y-axis location.
+            The default ``'index'`` gives each packet a unique y-position.
             
         text : bool, optional
-            Specifies whether text containing additional packet information
-            is plotted. For wide time-windows, or Traffic including many
-            (> 20) packets this is best set to False or the text will likely
-            overlap considerably.
+            Whether text containing additional packet information is plotted.
+            For wide time-windows, or Traffic including many (> 20) packets
+            this is best set to ``False`` or the text will likely overlap.
         
         linewidth : int, optional
             Sets the vertical width (height) of the packet lines.
@@ -375,7 +370,7 @@ class LoRaParameters():
 
     def __init__(self, nChannels=1, freq=915, bandwidth=125,
                  spreading=None, overhead=13, maxPow=30,
-                 dwellTime=400, dutyCycle=None, codingRate='4/5', **kwargs):
+                 dwellTime=0.4, dutyCycle=None, codingRate='4/5', **kwargs):
         """
         Instantiate LoRaParemeters instance.
 
@@ -403,7 +398,7 @@ class LoRaParameters():
             '4/5', '4/6', '4/7' or '4/8'. LoRaWAN uses '4/5'.
 
         dwellTime : float
-            Maximum permitted dwell time in ms. Use `None` if not restricted.
+            Maximum permitted dwell time in s. Use `None` if not restricted.
 
         dutyCycle : float
             Maximum duty cycle permitted. Use `None` if not resttrictred.
@@ -448,7 +443,7 @@ class LoRaParameters():
 
 
 
-
+    
 #=========================================================
 #        Traffic Generators
 #=========================================================
@@ -570,9 +565,45 @@ class IndependentLoRaGenerator(TrafficGenerator):
         airtimes = [airtime(payloads[i]+oh, spreadings[i], bw=bw, codingRate=cr) for i in range(N)]
         
         # form Traffic-objects
-        traffics = [Traffic(nObs[i], arrivals[i], airtimes[i],
+        sample = [Traffic(nObs[i], arrivals[i], airtimes[i],
                             channels[i], spreadings[i], powers[i]) for i in range(N)]
         
-        return traffics
+        return sample
 
+
+#=========================================================
+#        Thinning Models
+#=========================================================
+
+class ThinningModel(ABC):
+    """
+    A thinnning model for LoRa Traffic.
     
+    A thinning model takes a LoRa Traffic object and models which packets
+    in Traffic are successfully received and which are lost. This approach
+    assumes that all packets would be received if not interfereing with each
+    other; that is that the only source of interference is from within the
+    Traffic collection itself. The main output of a thnning model is a
+    vector of binary labels indicating successful reception / failure.
+    
+    """
+    
+    def thin(self):
+        pass
+    
+    def __call__(self, Traffic, *args, **kwargs):
+        """
+        Apply thinnning model to traffic.
+        
+        Parameters
+        ----------
+        Traffic : Traffic-object
+            See ``interference.Traffic``.
+        """
+        return self.thin(Traffic, *args, **kwargs)
+    
+    
+class AlohaThinning(ThinningModel):
+    """
+    TBD
+    """
