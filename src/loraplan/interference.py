@@ -16,6 +16,9 @@ import numpy as np
 from abc import ABC, abstractmethod
 from scipy.spatial import distance_matrix
 
+import matplotlib.pyplot as plt
+from matplotlib import collections  as mc
+
 
 
 
@@ -23,7 +26,7 @@ def airtime(payloadSize, sf, bw=125, codingRate='4/5',
             lowDrOptimize=False, explicitHeader=True,
             preambleLength=8):
     """
-    Airtime of LoRa transmission in milliseconds.
+    Airtime of LoRa transmission in seconds.
 
 
     Parameters
@@ -134,7 +137,7 @@ def airtime(payloadSize, sf, bw=125, codingRate='4/5',
 
     tPayload = symPayload * tSymbol
 
-    return tPreamble + tPayload
+    return (tPreamble + tPayload) / 1000
 
 
 
@@ -248,7 +251,79 @@ class Traffic():
             return result.copy()
         
         return result
+    
+    def to_dict(self):
+        """
+        Return stored data as a dictionary.
         
+        Notes
+        -----
+        Trivial but slightly more "readable" that __dict__.
+        """
+        
+        return self.__dict__
+        
+    def plot(self, y_variable='index', text=False, linewidths=25, **kwargs):
+        """
+        Plot wireless Traffic.
+        
+        Parameters
+        ----------
+        y_variable : str, optional
+            The variable in Traffic.to_dict() to be used as y-axis location.
+            The default ``'index`` places each packet on its own y-position.
+            
+        text : bool, optional
+            Specifies whether text containing additional packet information
+            is plotted. For wide time-windows, or Traffic including many
+            (> 20) packets this is best set to False or the text will likely
+            overlap considerably.
+        
+        linewidth : int, optional
+            Sets the vertical width (height) of the packet lines.
+            
+        kwargs
+            Passed to ``plt.subplots()``
+            
+        """
+    
+        # collect data
+        data = self.to_dict()
+        
+        data['index'] = list(range(data['nObs']))
+    
+        starts = list(zip(data['start'], data[y_variable]))
+        ends = list(zip(data['start'] + data['airtime'], data[y_variable]))
+                
+        packets = [[s,t] for (s,t) in zip(starts, ends)]
+                
+        # build plot
+        lc = mc.LineCollection(packets, linewidths=linewidths, color='cornflowerblue', alpha=0.4)
+        
+        fig, ax = plt.subplots(**kwargs)
+        ax.add_collection(lc)
+                
+        # scale plot and add labels
+        ax.autoscale()
+        ax.set_ylabel(f"{y_variable}")
+        ax.set_xlabel("time (s)")
+                
+        # get range of x-values
+        x_min = data['start'].min()
+        x_max = (data['start'] + data['airtime']).max()
+                
+        # plot additional information
+        if text:
+            for p in range(data['nObs']):
+                x, y = data['start'][p], data[y_variable][p]
+                # construct text
+                text = f"ch={data['channel'][p]}, sf={data['sf'][p]}"
+                offset =  + 0.02*(x_max - x_min)
+                plt.text(x+offset, y, text, color="k", fontsize=12)
+
+        ax.margins(0.25)
+                   
+        return fig, ax
         
         
     
@@ -458,7 +533,7 @@ class IndependentLoRaGenerator(TrafficGenerator):
         self.powerDist = powerDist
         
     
-    def sample(size=None, seed=None):
+    def sample(self, size=None, seed=None):
         """
         Sample LoRa wireless traffic.
         
@@ -474,26 +549,27 @@ class IndependentLoRaGenerator(TrafficGenerator):
         ``lp.interference.airtime``
         
         """
-        N = size
+                
+        arrivals = self.arrivals.sample(size=size)
         
-        arrivals = self.arrivals.sample(size=N)
+        N = len(arrivals) # N can be `None` up to here
         
         nObs = [arr.shape[0] for arr in arrivals]
         
-        # sample prameters
+        # sample prameters from respective distributions
         channels = [self.channelDist(size=n) for n in nObs]
         spreadings = [self.spreadingDist(size=n) for n in nObs]
         powers = [self.powerDist(size=n) for n in nObs]
-        payloads = [self.paylodDist(size=n) for n in nObs]
+        payloads = [self.payloadDist(size=n) for n in nObs]
         
         # compute airtimes
-        cr = self.parameters.codingRate
-        bw = self.parameters.bw
-        oh = self.parameters.overhead
+        cr = self.params.codingRate
+        bw = self.params.bw
+        oh = self.params.overhead
         
         airtimes = [airtime(payloads[i]+oh, spreadings[i], bw=bw, codingRate=cr) for i in range(N)]
         
-        # make traffic-objects
+        # form Traffic-objects
         traffics = [Traffic(nObs[i], arrivals[i], airtimes[i],
                             channels[i], spreadings[i], powers[i]) for i in range(N)]
         
