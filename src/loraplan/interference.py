@@ -575,9 +575,9 @@ class IndependentLoRaGenerator(TrafficGenerator):
 #        Thinning Models
 #=========================================================
 
-class ThinningModel(ABC):
+class InterferenceModel(ABC):
     """
-    A thinnning model for LoRa Traffic.
+    An interference model for LoRa Traffic.
     
     A thinning model takes a LoRa Traffic object and models which packets
     in Traffic are successfully received and which are lost. This approach
@@ -587,9 +587,6 @@ class ThinningModel(ABC):
     vector of binary labels indicating successful reception / failure.
     
     """
-    
-    def thin(self):
-        pass
     
     def __call__(self, Traffic, *args, **kwargs):
         """
@@ -603,7 +600,12 @@ class ThinningModel(ABC):
         return self.thin(Traffic, *args, **kwargs)
     
     
-class AlohaThinning(ThinningModel):
+class AlohaThinning(InterferenceModel):
+    """
+    TBD
+    """
+    
+class DeterminantalThinning(InterferenceModel):
     """
     TBD
     """
