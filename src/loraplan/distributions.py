@@ -164,7 +164,7 @@ class Rectangle(SpatialDomain):
     def __init__(self, bbox, name=None):
         """Initialize a rectangle.
         """
-        self.bbox = _check_bbox(bbox)
+        self.bbox = _check_bbox(*bbox)
         self.name = name
         
     @property
@@ -211,7 +211,7 @@ class Rectangle(SpatialDomain):
         if nPoints < 0:
             raise ValueError("Number of points must be non-negative.")
             
-        points = rng.uniform(0, 1, size=(n_pts, 2)) # standard uniforms
+        points = rng.uniform(0, 1, size=(nPoints, 2)) # standard uniforms
         
         points[:,0] *= self.width  # scale x-coordinates
         points[:,1] *= self.height # scale y-coordinates
@@ -231,9 +231,9 @@ class Rectangle(SpatialDomain):
         
         rng = np.random.default_rng(seed)
         
-        n_pts = rng.poisson(self.area * intensity)
+        nPoints = rng.poisson(self.area * intensity)
         
-        return self.uniform(n_pts, seed=seed)
+        return self.uniform(nPoints, seed=seed)
 
 
 
@@ -471,6 +471,67 @@ class PoissonArrivals(ArrivalProcess):
 #=========================================================
 #        Thinning models for (marked) Point processes
 #=========================================================
+
+def maternThinningI(points, radius, metric='euclidean', **kwargs):
+    """
+    Apply Matérn Type I thinning to a collection of points.
+    
+    Matérn Type I thinning is a determinisitc thinning process for
+    selecting a subset of points among a given set. Thi is a hard-core
+    point process; each point represents the center of a ball with
+    a hard-core. The thinned output consists of all non-overlapping 
+    points. In other words, every point that are too close to any
+    of the original points is thinned.
+    
+    Letting `D[i, j]` be the distance between points i and j this
+    function returns `True` for the `i`_th_ entry if for all j
+   
+    >`D[i, j] > radius[i] + radius[j]`
+    
+    Parameters
+    ----------
+    points : array_like
+        An array of shape (nPoints, nDims) of points in nDims
+        dimensional euclidean space.
+        
+    radius : float or array_like
+        A radius for the cores around the points. Can be array_like
+        in order to equip each point with its own radius.
+    
+    metric : str or function, optional
+        Passed to `scipy.spatial.distance.pdist`.
+    
+    kwargs
+        Passed to `scipy.spatial.distance.pdist`.
+    
+    Returns
+    -------
+    retained : array of booleans
+        An array of boolens of length nPoints indicating whether a
+        point is retained (True) or thinned (False).
+        
+    See Also
+    --------
+    `scipy.spatial.distance.pdist`
+    """
+
+    if not isinstance(radius, (collections.abc.Sequence, np.ndarray)):
+        radius = np.repeat(radius, points.shape[0])
+    else:
+        if radius.shape[0] != points.shape[0]:
+            raise ValueError("Number of points and number of radii do not match.")
+    
+    # compute pairwise distances
+    D = squareform(pdist(points, metric=metric, **kwargs))
+    
+    np.fill_diagonal(D, np.inf)
+    
+    R = radius[np.newaxis,] + radius[np.newaxis,].T
+    
+    return (D > R).all(axis=1)
+
+
+
 
 def ThinningModel(ABC):
     """

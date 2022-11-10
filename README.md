@@ -25,3 +25,11 @@ See the `sphinx-proofs` extension that you may want for fun. [Link](https://gith
 Check out this [Colab demo](https://colab.research.google.com/github/googlecolab/colabtools/blob/master/notebooks/colab-github-demo.ipynb#scrollTo=3VQqVi-3ScBC).
 
 It seems possible to maintain a folder of noteoboks, and to create a link that opens a notebook in colab.
+
+## Testing
+- Read about [pytest](https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html#test-discovery)
+
+## Additional learning.
+
+- Best practices on strucure and testing on [Ionel MC's blog](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure%3E)
+ 
