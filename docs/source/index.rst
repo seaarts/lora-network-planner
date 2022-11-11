@@ -28,8 +28,8 @@ Algorithms
 ----------
 
 
-Distributions
--------------
+Probability
+-----------
 
 
 .. toctree::

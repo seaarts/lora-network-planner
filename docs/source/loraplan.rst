@@ -1,43 +1,46 @@
 loraplan package
 ================
 
+.. toctree::
+   :maxdepth: 4
 
-loraplan.algorithms module
---------------------------
 
-.. automodule:: loraplan.algorithms
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-loraplan.distributions module
------------------------------
-
-.. automodule:: loraplan.distributions
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-loraplan.interference module
-----------------------------
-
-.. automodule:: loraplan.interference
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-loraplan.planning module
-------------------------
+planning
+--------
 
 .. automodule:: loraplan.planning
    :members:
    :undoc-members:
    :show-inheritance:
 
-loraplan.propagation module
----------------------------
+interference
+------------
+
+.. automodule:: loraplan.interference
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+propagation
+-----------
 
 .. automodule:: loraplan.propagation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms
+----------
+
+.. automodule:: loraplan.algorithms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+distributions
+-------------
+
+.. automodule:: loraplan.distributions
    :members:
    :undoc-members:
    :show-inheritance:
