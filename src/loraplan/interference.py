@@ -19,6 +19,7 @@ from scipy.spatial import distance_matrix
 import matplotlib.pyplot as plt
 from matplotlib import collections  as mc
 
+from loraplan.distributions import maternThinningI
 
 
 
@@ -154,18 +155,23 @@ class Traffic():
     ----------
     nPackets : int
         Number of packets in traffic instance.
+        
     start : array-like of float
         Start times of packets.
+        
     airtime : array-like of float
         Time-on-air of packets.
+        
     channel : array-like of int
         Channels of packets.
+        
     sf : array-like of int
         Spreading factors of packets.
+        
     power : array-like of float
         Power of packets.
         This can be taken to be either transmitted or received
-        power (usually dBm), depending on context. 
+        power (usually dBm), depending on context.    
 
     Notes
     -----
@@ -211,19 +217,29 @@ class Traffic():
 
         """
         
-        self.nObs = nPackets
-        self.start = start
-        self.airtime = airtime
-        self.channel = channel
-        self.sf = sf
-        self.power = power
+        self.nObs = np.array(nPackets)
+        self.start = np.array(start)
+        self.airtime = np.array(airtime)
+        self.channel = np.array(channel)
+        self.sf = np.array(sf)
+        self.power = np.array(power)
+    
+    @property
+    def midpoint(self):
+        """
+        Get midpoint of transmissions.
+        """
+        return self.start + (self.airtime / 2)
+    
     
     def __repr__(self):
         return f"Traffic({self.__dict__})"
     
+    
     def __str__(self):
         nObs = self.nObs
         return f"Traffic({nObs=})"
+    
     
     def to_numpy(self, copy=False):
         """
@@ -240,7 +256,7 @@ class Traffic():
         np.ndarray
         """
 
-        result = np.zeros(shape=(self.nObs, 5))
+        result = np.zeros(shape=(self.nObs, 6))
         
         
         for i, vals in enumerate(self.__dict__.values()):
@@ -252,14 +268,31 @@ class Traffic():
         
         return result
     
+    
     def to_dict(self):
         """
         Return Traffic data as a dictionary. Equivalent to ``__dict__``.
         """
-        
         return self.__dict__
-        
-    def plot(self, y_variable='index', text=False, linewidths=25, **kwargs):
+    
+    
+    def thinALOHA(self):
+        """
+        Get retention labels under ALOHA-style thinning.
+        """
+        if self.nObs == 0:
+            return []
+    
+        points = np.vstack((self.midpoint, self.channel, self.sf)).T
+    
+        radii = self.airtime / 2
+    
+        eps = 1.0e-30 # essentially 0 for which 0/0 is 0.
+    
+        return maternThinningI(points, radii, metric='seuclidean', V=[1, eps, eps])
+    
+    
+    def plot(self, y_variable='index', labels=None, text=False, linewidths=25, **kwargs):
         """
         Plot wireless Traffic.
         
@@ -268,7 +301,10 @@ class Traffic():
         y_variable : str, optional
             The variable in ``Traffic.to_dict()`` to be used as y-axis location.
             The default ``'index'`` gives each packet a unique y-position.
-            
+        
+        labels : array_like of bools
+            Labels for whether the transmission is successful or not.
+        
         text : bool, optional
             Whether text containing additional packet information is plotted.
             For wide time-windows, or Traffic including many (> 20) packets
@@ -291,9 +327,16 @@ class Traffic():
         ends = list(zip(data['start'] + data['airtime'], data[y_variable]))
                 
         packets = [[s,t] for (s,t) in zip(starts, ends)]
-                
+        
+        # color by label if present
+        if hasattr(labels, '__len__'):
+            cmap = {True: 'cornflowerblue', False:'darkorange'}
+            color = [cmap[label] for label in labels]
+        else:
+            color = 'cornflowerblue'
+        
         # build plot
-        lc = mc.LineCollection(packets, linewidths=linewidths, color='cornflowerblue', alpha=0.4)
+        lc = mc.LineCollection(packets, linewidths=linewidths, color=color, alpha=0.4)
         
         fig, ax = plt.subplots(**kwargs)
         ax.add_collection(lc)
@@ -485,7 +528,7 @@ class IndependentLoRaGenerator(TrafficGenerator):
 
     The ``IndependentLoRaGenerator`` is a ``TrafficGenerator``-object for when
     parameters are distributed independently of each other and of the arrivals.
-    This object's main function is to collect various model components in one
+    The main purpose of this object is to collect various model components in one
     place. In particular, an ``ArrivalProcess``, ``LoRaParameters`` and
     ``Distribution``-objects over the various wireless parameters.
     

@@ -21,6 +21,8 @@ import collections.abc
 import warnings
 
 from scipy.stats import norm
+from scipy.spatial.distance import pdist, squareform
+
 #from sklearn.gaussian_process import GaussianProcessRegressor
 #from sklearn.metrics.pairwise import euclidean_distances
 
@@ -484,9 +486,8 @@ def maternThinningI(points, radius, metric='euclidean', **kwargs):
     of the original points is thinned.
     
     Letting `D[i, j]` be the distance between points i and j this
-    function returns `True` for the `i`_th_ entry if for all j
-   
-    >`D[i, j] > radius[i] + radius[j]`
+    function returns `True` for the `i`_th_ entry if for all `j`
+    ``D[i, j] > radius[i] + radius[j]``.
     
     Parameters
     ----------
@@ -531,151 +532,6 @@ def maternThinningI(points, radius, metric='euclidean', **kwargs):
     return (D > R).all(axis=1)
 
 
-
-
-def ThinningModel(ABC):
-    """
-    An abstract thinning model.
-    """
-    
-    def __init__(self):
-        pass
-    
-    @abstractmethod
-    def thin():
-        pass
-    
-    def __call__(self, points, *args, **kwargs):
-        """Call the thinning model.
-        """
-        return self.thin(points, *args, **kwards)
-
-    
-class MaternThinning:
-    """
-    A Matérn thinning model.
-    
-    Matérn thinning is a hard-core thinning process for a collection of points
-    in which each point is equipped with a mark. A ball (core) of fixed radius
-    is drawn around each point. Points with overlapping cores are considered
-    colliding. How collisions are resolved depends on the type. Each type is
-    more forgiving than the last.
-    #. Type I: All colliding points are thinned. This models scenarios in which
-    it is impossible to observe points withing 2 radii of each other.
-    #. Type II: Among colliding pairs, the one with the higher mark is retained,
-    the other points is are thinned.
-    #. Type III: Among colliding pairs, only points with colliding neighbors
-    that are both higher marked *and* retained are thinned.
-    
-    Attributes
-    ----------
-    radius : float
-        Fixed radius of interaction between points.
-    kind : str, optional
-        Default is '1', while '2' and '3' are also supported. See notes.
-    
-    Methods
-    -------
-    thin
-        Thins a given (marked) point process.
-        
-    Notes
-    -----
-    The process is named after Bertil Matérn who published on them in 1962.
-    """
-    
-    def __init__(self, radius, kind='1'):
-        """
-        Instantiate Matérn thinning model.
-        """
-        self.radius = radius
-        self.kind = kind
-    
-    def thin(self, points, marks=None, radius=None, kind=None):
-        """
-        Applies Matérn thinning to a collection of points.
-        
-        Parameters
-        ----------
-        points : array_like
-            An array of point coordinates of shape [nPoints, nDims] where
-            nPoints is the number of points, and nDims the dimensionality
-            of the space the points occupy.
-        
-        marks : array-like, optional
-            Array of marks, used only if kind == '2' or '3'. Marks should
-            support comparisons (>, <, =) and match `points` in 1st dim.
-        
-        radius : float, optional
-            Optional radius that, if provided, overrides internal radius.
-        
-        kind : str, optional
-            Optional kind-str that overrides internal kind if provided.
-        
-        Returns
-        -------
-        retained : array of bools
-            An array of bools labeling each points is retained or thinned.
-        """
-   
-    
-        # sample start and end times of each point
-        starts = [np.random.uniform(0, 3, n) for n in n_points]
-        for i in range(len(starts)):
-            starts[i].sort() # sort start times
-        ends = [s + airtime for s in starts]
-        times = [np.vstack((starts[i], ends[i])).T for i in range(len(ends))] # stack
-        times = [t/airtime for t in times] # normalize times by airtime
-    
-        # compute overlap between points
-        D = [pdist(s.reshape(len(s), 1), metric="euclidean") for s in starts]
-        D = [squareform(d) for d in D]   # make full square matrices
-        D = [(d < airtime)*1 for d in D] # 0-1 matrices of overlap
-    
-        overlap = [np.sum(d, axis=0) for d in D]
-        overlap = [(ovlp > 1)*1 for ovlp in overlap]
-    
-        # compute dummy for overlapping with earlier point
-        D = [d * (1 - np.tri(*d.shape, k=0)) for d in D] # takes upper triangle of collisions
-        X = [np.sum(d, axis=0) for d in D] # vectors of nr. overlapping pre-arriving packets
-    
-        overlap_early = [(x > 0)*1 for x in X] # dummy overlapping with earlier point
-    
-        # collect data
-        for i in range(len(X)):
-            ones = np.ones(len(X[i]))
-            zeros = np.zeros(len(X[i]))
-            X[i] = np.vstack((zeros,
-                              ones,
-                              overlap[i],
-                              overlap_early[i],
-                              #starts[i]/airtime
-                             )).T  # add 1s column to X
-    
-        # get Matérn type III inclusion
-        for j in range(len(D)):
-            n_points = D[j].shape[0]
-            if n_points > 0:
-                for i in range(1, len(D[j])):
-                    if D[j][:,i].sum() > 0:
-                        # reject i and remove all 1s in i's row
-                        D[j][i, i:n_points] = np.zeros(n_points - i)
-            X[j][:,0] = D[j].sum(axis=0)    
-
-        
-        incl  = [np.where(x[:,0]==0)[0] for x in X]
-    
-        X = [x[:, 1:] for x in X] # drop ground truth
-    
-        if kind == '2':
-            # get inclusion from 3rd column: 'overlap_early'
-            incl = [np.where(x[:,2]==0)[0] for x in X] 
-    
-        if kind == '1':
-            # get inclusion from 2nd column: 'overlap'
-            incl = [np.where(x[:,1]==0)[0] for x in X]
-        
-        return X, times, incl, D
     
     
 #=========================================================
