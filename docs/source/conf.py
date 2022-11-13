@@ -44,3 +44,13 @@ exclude_patterns = []
 html_theme = 'sphinx_rtd_theme'
 #html_theme = 'classic'
 html_static_path = ['_static']
+
+
+
+#-- Latex setup --------------------------------------------------------------
+latex_engine = 'xelatex'
+latex_elements = {
+    'preamble': r'''
+\DeclareMathOperator{\diag}{diag}
+'''
+}

@@ -125,7 +125,7 @@ class ConnectionQuality(ABC):
 
     
 class LogErrorRate(ConnectionQuality):
-    """
+    r"""
     Negative log error rate quality model.
     
     This class of quality model combines path loss and iid gaussian noice.
