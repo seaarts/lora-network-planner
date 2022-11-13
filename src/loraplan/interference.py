@@ -217,7 +217,7 @@ class Traffic():
 
         """
         
-        self.nObs = np.array(nPackets)
+        self.nObs = nPackets
         self.start = np.array(start)
         self.airtime = np.array(airtime)
         self.channel = np.array(channel)
@@ -255,9 +255,6 @@ class Traffic():
         -------
         np.ndarray
         """
-
-        result = np.zeros(shape=(self.nObs, 6))
-        
         
         for i, vals in enumerate(self.__dict__.values()):
             if i > 0:
@@ -269,16 +266,32 @@ class Traffic():
         return result
     
     
-    def to_dict(self):
+    def to_dict(self, addConstant=True):
         """
-        Return Traffic data as a dictionary. Equivalent to ``__dict__``.
+        Return Traffic data as a dictionary.
+        
+        Parameters
+        ----------
+        addConstant : bool, optional
+            Whether to add a data column ``constant`` of ``1``s to dictionary.
+            Defaults to ``True``.
         """
-        return self.__dict__
+        
+        data = self.__dict__.copy()
+        
+        if addConstant:
+            data['constant'] = np.ones(self.nObs)
+        
+        return data 
     
     
     def thinALOHA(self):
         """
         Get retention labels under ALOHA-style thinning.
+        
+        See Also
+        --------
+        FIX: Link to Matérn thinning and some references.
         """
         if self.nObs == 0:
             return []
@@ -535,10 +548,10 @@ class IndependentLoRaGenerator(TrafficGenerator):
     
     Attributes
     ----------
-    arrivalProcess : ArrivalProcess
+    arrivals : ArrivalProcess
         An arrival process for generating nr. of packets and arrival times.
         
-    loraParams : LoRaParameters
+    params : LoRaParameters
         A LoRaParameters-object from which essential parameters are pulled.
     
     channelDist : Distribution
@@ -557,14 +570,14 @@ class IndependentLoRaGenerator(TrafficGenerator):
     
     """
     
-    def __init__(self, arrivalProcess, loraParams, channelDist,
+    def __init__(self, arrivals, params, channelDist,
                  spreadingDist, payloadDist, powerDist):
         """
         Initialize LoRa traffic generator with independent parameter distributions.
         """
         
-        self.arrivals = arrivalProcess
-        self.params = loraParams
+        self.arrivals = arrivals
+        self.params = params
         self.channelDist = channelDist
         self.spreadingDist = spreadingDist
         self.payloadDist = payloadDist
@@ -584,7 +597,7 @@ class IndependentLoRaGenerator(TrafficGenerator):
         
         See Also
         --------
-        ``lp.interference.airtime``
+        ``loraplan.interference.airtime``
         
         """
                 
@@ -613,42 +626,3 @@ class IndependentLoRaGenerator(TrafficGenerator):
         
         return sample
 
-
-#=========================================================
-#        Thinning Models
-#=========================================================
-
-class InterferenceModel(ABC):
-    """
-    An interference model for LoRa Traffic.
-    
-    A thinning model takes a LoRa Traffic object and models which packets
-    in Traffic are successfully received and which are lost. This approach
-    assumes that all packets would be received if not interfereing with each
-    other; that is that the only source of interference is from within the
-    Traffic collection itself. The main output of a thnning model is a
-    vector of binary labels indicating successful reception / failure.
-    
-    """
-    
-    def __call__(self, Traffic, *args, **kwargs):
-        """
-        Apply thinnning model to traffic.
-        
-        Parameters
-        ----------
-        Traffic : Traffic-object
-            See ``interference.Traffic``.
-        """
-        return self.thin(Traffic, *args, **kwargs)
-    
-    
-class AlohaThinning(InterferenceModel):
-    """
-    TBD
-    """
-    
-class DeterminantalThinning(InterferenceModel):
-    """
-    TBD
-    """
