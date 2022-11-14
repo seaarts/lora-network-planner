@@ -1,7 +1,9 @@
-r"""
-A module of determinantal thinning models.
+#!/usr/bin/env python
 
-A determinantal thinning model is a model for subset selection that
+r"""
+Implements determinantal thinning models.
+
+A *determinantal thinning model* is a model for subset selection that
 leverages determinantal point processes. A determinantal process over
 a set :math:`X` of size :math:`n` is characterized by a p.s.d symmetric
 n-by-n matrix :math:`L` know as an *L-ensemble*. The likelihood of
@@ -34,9 +36,16 @@ The L-ensemble the matrix formed by elements
 This module implements a ``Quality`` class and a ``Similarity`` class.
 """
 
-from abc import ABC, abstractmethod
 import numpy as np
+from abc import ABC, abstractmethod
 from scipy.linalg import cho_factor, cho_solve
+
+
+__author__ = "Sander Aarts"
+__license__ = "MIT"
+__version__ = "0.1"
+__maintainer__ = "Sander Aarts"
+__email__ = "sea78@cornell.edu"
 
 
 #=========================================================
