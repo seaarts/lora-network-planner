@@ -1,5 +1,55 @@
-"""
-The ``planning`` submodule makes high-level network planning simple.
+r"""
+The planning submodule makes high-level network planning simple.
+
+
+This module takes an object-oriented approach to modeling covering integer
+programs (CIPs). A covering integer program has three main components.
+
+#. A set of :math:`n` **demands** denoted :math:`D`
+
+    * Demands represent locations at which coverage is required.
+    
+    * Each demand :math:`i \in D` is equipped with a *requrement* :math:`b_i > 0`.
+    
+    * Demands may also be associated with a location in space.
+    
+#. A set of :math:`m` **facility locations** denoted :math:`F`
+
+    * Facility locations are where where can install wireless receivers.
+    
+    * Each facility locaiton :math:`j \in F` has a *cost* :math:`f_j`.
+    
+    * This cost can represent the cost of hardware and installation
+    
+    * Costs can additionaly represent amortized maintenance costs or rent
+    
+    * A facility location naturally can also be associated with a location in space.
+    
+    * For e.g. LoRa applications knowing the altitute is also helpful.
+    
+#. An :math:`n \times m` **coverage matrix** denoted :math:`A`.
+
+    * Element :math:`a_{ij}` is the coverage provided to demand :math:`i` by facility :math:`j`.
+    
+    * In the case of LoRa this is the negative log reception rate.
+    
+
+The covering integer problem is to install facilities at deisgnated locations such that
+every demand is sufficiently covered, while minimizing the total facility cost.
+We associate a decision vairable :math:`x_j` with each facility location. The variable
+:math:`x_j` takes value :math:`1` if we install a facility at location :math:`j \in F`,
+and :math:`0` otherwise. We only incur the facility cost :math:`f_j` when we install
+the facility at :math:`j`. Simiarly, a facility :math:`` only contributes towards demand
+:math:`i`'s requirement if it is installed. We require that the sum of contributions to
+demand :math:`i` is at least `b_i`. These is summarized in the integer progam (IP) below.
+
+.. math::
+    \begin{align}
+    \min \sum^n_{j=1}f_j &x_j  \\
+    \text{s.t. } \sum^n_{j=1}a_{ij}&x_j \geq b_i && \forall i \in D\\
+    &x_{j} \leq 1 && \forall j \in F\\
+    &x_j \geq 0 && \forall j \in F
+    \end{align}
 
 """
 
@@ -7,6 +57,19 @@ from abc import ABC, abstractmethod
 
 class Demands:
     """ Demand point class.
+    
+    This implements a set of demands :math:`D` with their associated
+    locations in space ``locs`` as well as their requirements :math:`b_i`
+    as ``reqs``.
+    
+    
+    Attributes
+    ----------
+    locs : array_like of floats
+        Locations of demand points.
+        
+    reqs : array_like of floats
+        Requirements of demand points.
     """
     
     def __init__(self, locs, reqs):
@@ -14,8 +77,8 @@ class Demands:
         
         Parameters
         ----------
-        locs : array of floats
-            Locations of demand points
+        locs : array_like of floats
+            Array of demand location coordinates.
         reqs : array of floats
             Service requirements of demand points
             
@@ -25,8 +88,6 @@ class Demands:
             If requirements are not 1-dimensional.
         ValueError
             If number of locs does nod match the number of reqs.
-        ValueError
-            If locations do not have 2 columns.
         """
 
         # verify locations
@@ -38,29 +99,35 @@ class Demands:
         if locs.shape[0] != len(reqs):
             raise ValueError("Number of rows in locs and reqs do not match")
             
-        elif locs.shape[1] != 2:
-            raise ValueError("Number of columns in locs not equal to 2.")
-        
         self.locs = locs
         self.reqs = reqs
         
     @property
-    def n_pts(self):
-        """The number of demand points.
+    def n_points(self):
+        """Returns the number of demand points.
         """
         return self.reqs.shape[0]
+    
+    def __len__(self):
+        return self.n_points()
 
 
 
 
 class Facilities:
-    """ Facility class.
+    """A Facility location class.
+    
+    Attributes
+    ----------
+    locs : array_like of floats
+        Array of facility location coordinates.
+        
+    cost : array_like of floats
+        Array of facility costs :math:`f_j`.
     """
     
     def __init__(self, locs, cost):
-        """ Initialize class.
-        ::param locs:: location coordinates of points (numpy.array)
-        ::param cost:: requirement vector (numpy.array)
+        """ Initialize Facilities class.
         """
 
         # verify locations
@@ -72,17 +139,17 @@ class Facilities:
         if locs.shape[0] != len(cost):
             raise ValueError("Number of rows in locs and reqs do not match")
             
-        elif locs.shape[1] != 2:
-            raise ValueError("Number of columns in locs not equal to 2.")
-        
         self.locs = locs
         self.cost = cost
         
     @property
-    def n_pts(self):
-        """Get number of facility locations.
+    def n_points(self):
+        """Returns number of facility locations.
         """
         return self.cost.shape[0]
+    
+    def __len__(self):
+        return self.n_points()
 
 
 ### Connection Quality models
