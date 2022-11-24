@@ -256,6 +256,8 @@ class Traffic():
         np.ndarray
         """
         
+        result = np.zeros((len(self.__dict__), self.nObs))
+
         for i, vals in enumerate(self.__dict__.values()):
             if i > 0:
                 result[:, i-1] = vals
@@ -302,8 +304,24 @@ class Traffic():
     
         eps = 1.0e-30 # essentially 0 for which 0/0 is 0.
     
-        return thinning_matern.maternThinningI(points, radii, metric='seuclidean', V=[1, eps, eps])
-    
+        return thinning_matern.maternThinningI(points,
+            radii,
+            metric='seuclidean',
+            V=[1, eps, eps]
+            )
+
+
+    def thinDeterminantal(self, ensemble, params):
+        """
+        Sample retention labels under given determinantal thinning model.
+
+        Determinantal thinning takes a determinantal model, in the for mof an
+        L-ensemble ``enesemble``, and is parameterers ``params`` and samples
+        the retained packets based on the model. It is assumed that the model
+        exclusively uses variables that are available in the Traffic-object's
+        ``self.__dict__``. If not, an error is raised. 
+        """
+
     
     def plot(self, y_variable='index', labels=None, text=False, linewidths=25, **kwargs):
         """
