@@ -12,14 +12,14 @@ interference. We use a ``CollisionModel`` class that takes ``Traffic``-objects
 and assigns labels to each transmission.
 """
 
+from loraplan.probability import thinning_matern
+from loraplan.probability import point_processes as lpp
+from loraplan.probability import distributions as lpd
+
 import numpy as np
-from abc import ABC, abstractmethod
-from scipy.spatial import distance_matrix
-
 import matplotlib.pyplot as plt
+from abc import ABC, abstractmethod
 from matplotlib import collections  as mc
-
-from loraplan.distributions import maternThinningI
 
 
 
@@ -302,7 +302,7 @@ class Traffic():
     
         eps = 1.0e-30 # essentially 0 for which 0/0 is 0.
     
-        return maternThinningI(points, radii, metric='seuclidean', V=[1, eps, eps])
+        return thinning_matern.maternThinningI(points, radii, metric='seuclidean', V=[1, eps, eps])
     
     
     def plot(self, y_variable='index', labels=None, text=False, linewidths=25, **kwargs):
@@ -488,13 +488,14 @@ class LoRaParameters():
         # save keyword arguments
         self.__dict__.update(kwargs)
 
-    def __repr__(self):
-        return "LoRaParameters(%r)" % self.__dict__
+    #def __repr__(self):
+    #    return "LoRaParameters(%r)" % self.__dict__
 
-    def __str__(self):
-        out = "A LoRa Parameters object with params:"
-        for k, v in self.__dict__.items():
-            out += f"\n\t {k}: {v}"
+    def __repr__(self):
+        out = "LoraParameters("
+        for key, val in self.__dict__.items():
+            out += f"\n\t {key}: {val}"
+        out += ")"
         return out
 
 
@@ -583,6 +584,63 @@ class IndependentLoRaGenerator(TrafficGenerator):
         self.payloadDist = payloadDist
         self.powerDist = powerDist
         
+    def __repr__(self):
+        out = f"IndependentLoRaGenerator("
+        for key, val in self.__dict__.items():
+            out += f"\n\t{key}: {val}"
+        out += ")"
+        return out
+        
+    @classmethod
+    def from_parameters(cls, params,
+                       tMin=0, tMax=1, buffer=1, rate=3,
+                       p_channel=None, p_spread=None,
+                       a_payload=11, p_payload=None,
+                       loc_pow = -80, scale_pow=10 
+                      ):
+        """
+        Make and IndependentLoRaGenerator from LoRaParameters.
+        
+        This is a convenience function that makes the simplest distribution
+        over a LoRaParameters object, with some additions.
+        
+        Parameters
+        ----------
+        params : LoRaParameters
+        tMin : float
+        tMax : float
+        buffer : float
+        rate : int
+        p_channel : array_like of floats
+        p_spread : array_like of floats
+        a_payload : int, or array_like of ints
+        p_payload : array_like of floats
+        loc_pow : float
+        scale_pow : float
+        
+        """
+        
+        if not isinstance(params, LoRaParameters):
+            raise ValueError("params must be a LoRaParameters-object.")
+            
+        # default arrival process and param distributions
+        window = lpp.TimeWindow(tMin, tMax, buffer=buffer)
+        arrivals = lpp.PoissonArrivals(timeWindow=window, rate=rate)
+        
+        # channel distribution
+        channelDist = lpd.Choice(params.nChannels, p=p_channel)
+        
+        # sperading factor distirbution
+        spreadingDist = lpd.Choice(params.sf, p=p_spread)
+        
+        # payload distribution
+        payloadDist = lpd.Choice(a=a_payload, p=p_payload)
+    
+        # a power distribution
+        powerDist = lpd.Normal(loc=loc_pow, scale=scale_pow)
+
+        return cls(arrivals, params, channelDist,
+                   spreadingDist, payloadDist, powerDist)
     
     def sample(self, size=None, seed=None):
         """

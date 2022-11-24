@@ -250,7 +250,7 @@ class TimeWindow(SpatialDomain):
         
     """
     
-    def __init__(self, tMin, tMax, buffer=0):
+    def __init__(self, tMin=0, tMax=1, buffer=0):
         """Specify a time-window by start and end points.
         
         Parameters

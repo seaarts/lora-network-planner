@@ -26,6 +26,10 @@ interference, and determinantal thinnig.
 
 """
 
+import collections.abc
+import numpy as np
+from scipy.spatial.distance import pdist, squareform
+
 def maternThinningI(points, radius, metric='euclidean', **kwargs):
     r"""
     Apply Matérn Type I thinning to a collection of points.
