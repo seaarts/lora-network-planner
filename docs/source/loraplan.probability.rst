@@ -2,10 +2,10 @@ loraplan.probability package
 ============================
 
 
-spatial
+point_processes
 ---------------------------------------------------
 
-.. automodule:: loraplan.probability.spatial
+.. automodule:: loraplan.probability.point_processes
    :members:
    :undoc-members:
    :show-inheritance: 

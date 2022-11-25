@@ -27,40 +27,42 @@ interference, and determinantal thinnig.
 """
 
 import collections.abc
+
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
-def maternThinningI(points, radius, metric='euclidean', **kwargs):
+
+def maternThinningI(points, radius, metric="euclidean", **kwargs):
     r"""
     Apply Matérn Type I thinning to a collection of points.
-    
+
     Matérn Type I thinning is a determinisitc thinning process for
     selecting a subset of points among a given set. Thi is a hard-core
     point process; each point represents the center of a ball with
-    a hard-core. The thinned output consists of all non-overlapping 
+    a hard-core. The thinned output consists of all non-overlapping
     points. In other words, every point that are too close to any
     of the original points is thinned.
-    
+
     Letting ``D[i, j]`` be the distance between points ``i`` and ``j``
     this function returns ``True`` for the ``i`` th entry if for all
     ``j`` if holds that ``D[i, j] > radius[i] + radius[j]``.
-    
+
     Parameters
     ----------
     points : array_like
         An array of shape (nPoints, nDims) of points in nDims
         dimensional euclidean space.
-        
+
     radius : float or array_like
         A radius for the cores around the points. Can be array_like
         in order to equip each point with its own radius.
-    
+
     metric : str or function, optional
         Passed to `scipy.spatial.distance.pdist`.
-    
+
     kwargs
         Passed to `scipy.spatial.distance.pdist`.
-    
+
     Returns
     -------
     retained : array of booleans
@@ -73,12 +75,19 @@ def maternThinningI(points, radius, metric='euclidean', **kwargs):
     else:
         if radius.shape[0] != points.shape[0]:
             raise ValueError("Number of points and number of radii do not match.")
-    
+
     # compute pairwise distances
     D = squareform(pdist(points, metric=metric, **kwargs))
-    
+
     np.fill_diagonal(D, np.inf)
-    
-    R = radius[np.newaxis,] + radius[np.newaxis,].T
-    
+
+    R = (
+        radius[
+            np.newaxis,
+        ]
+        + radius[
+            np.newaxis,
+        ].T
+    )
+
     return (D > R).all(axis=1)
