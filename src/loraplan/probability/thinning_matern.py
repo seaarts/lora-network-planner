@@ -69,10 +69,12 @@ def maternThinningI(points, radius, metric="euclidean", **kwargs):
         An array of boolens of length nPoints indicating whether a
         point is retained (True) or thinned (False).
     """
+    points = np.atleast_2d(points)
 
     if not isinstance(radius, (collections.abc.Sequence, np.ndarray)):
         radius = np.repeat(radius, points.shape[0])
     else:
+        radius = np.array(radius)
         if radius.shape[0] != points.shape[0]:
             raise ValueError("Number of points and number of radii do not match.")
 
