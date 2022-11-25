@@ -19,3 +19,9 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/seaarts/lora-network-planner"
+
+[tool.pytest.ini_options]
+addopts = "--cov=loraplan"
+testpaths = [
+  "tests",
+]
