@@ -19,8 +19,6 @@ import collections.abc
 from abc import ABC, abstractmethod
 
 import numpy as np
-from scipy.spatial.distance import pdist, squareform
-from scipy.stats import norm
 
 # from sklearn.gaussian_process import GaussianProcessRegressor
 # from sklearn.metrics.pairwise import euclidean_distances
@@ -131,8 +129,8 @@ class SpatialDomain(ABC):
         rng = np.random.default_rng(seed)
 
         # verify GP is well-defined
-        if not isinstance(gaussian_process, GaussianProcessRegressor):
-            raise ValueError(f"The gaussian_process is not a {gp_type}")
+        # if not isinstance(gaussian_process, GaussianProcessRegressor):
+        #    raise ValueError(f"The gaussian_process is not a {gp_type}")
 
         points_latent = self.poisson(intensity_latent, seed=rng)
 
@@ -144,7 +142,7 @@ class SpatialDomain(ABC):
 
         # sample retained points given intensity
         uniforms = rng.uniform(0, 1, size=points_latent.shape[0])
-        ponits_observer = points_latent[uniforms <= intensities]
+        points_observed = points_latent[uniforms <= intensities]
 
         return points_observed
 
@@ -341,7 +339,8 @@ class ArrivalProcess(ABC):
 
     Notes
     -----
-    Should support richer distirbutions than Poisson, e.g. spatial models with duty cycles.
+    Should support richer distirbutions than Poisson,
+    e.g. spatial models with duty cycles.
     """
 
     def __init__(self):

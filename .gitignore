@@ -1,4 +1,4 @@
-# Project specific files (Sander)
+# Project specific files (added by me)
 loraplan/scratchpad.ipynb
 
 # Byte-compiled / optimized / DLL files
@@ -133,3 +133,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# vs-code
+.vscode/

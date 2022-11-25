@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
-import numpy
+import numpy as np
 
 
 class LogLinearPathLoss(ABC):
@@ -79,7 +79,8 @@ class HataPathLoss(LogLinearPathLoss):
     -----
     The Hata model is an empirical model designed for urban settings.
 
-    Read more about the Hata path loss model at `https://en.wikipedia.org/wiki/Hata_model`.
+    Read more about the Hata path loss model at
+    `https://en.wikipedia.org/wiki/Hata_model`.
     """
 
     def __init__(self, freq=915, h_rx=30, h_tx=1.5, kind="urban", city_size="small"):
@@ -108,7 +109,6 @@ class HataPathLoss(LogLinearPathLoss):
         if city_size not in ["small", "medium", "large"]:
             raise ValueError('city_size must be "small", "medium" or "large".')
 
-        ### compute constant
         const = 69.55 + 26.16 * np.log10(freq) - 13.82 * np.log10(h_rx)
 
         # height correction (open, suburban, small cities, medium cities)
@@ -163,7 +163,7 @@ class IndoorPathLoss(LogLinearPathLoss):
     `https://en.wikipedia.org/wiki/ITU_model_for_indoor_attenuation`.
     """
 
-    def __init__(self, freq, n_floors, kind="office"):
+    def __init__(self, freq, nFloors, kind="office"):
         """
         Initialize model for given frequency and number of floors.
 
@@ -181,13 +181,13 @@ class IndoorPathLoss(LogLinearPathLoss):
             raise ValueError("nFloors should be integer")
         if nFloors < 0:
             raise ValueError("nFloors must be non-negative")
-        if n_floors > 3:
+        if nFloors > 3:
             raise ValueError("nFloors must not exceed 3")
 
         if kind not in ["office", "commercial"]:
             raise ValueError("The `kind` must be either 'office' or 'commercial'")
 
-        ###  only implemented for ca 900 MHz
+        # only implemented for ca 900 MHz
 
         # floor penetration factor and coefficient
         if kind == "commercial":
@@ -198,7 +198,7 @@ class IndoorPathLoss(LogLinearPathLoss):
         elif kind == "office":
             # floor-pependent penetration, large coefficients
             penetration_map = {0: 0, 1: 9, 2: 19, 3: 24}
-            penetration = penetration_map[n_floors]
+            penetration = penetration_map[nFloors]
             coeff = 33
 
         const = 20 * np.log10(freq) + penetration - 28
@@ -207,5 +207,5 @@ class IndoorPathLoss(LogLinearPathLoss):
         super().__init__("ITU indoor path loss (%s)" % kind, const, coeff)
 
         self.freq = freq
-        self.n_floors = n_floors
+        self.n_floors = nFloors
         self.kind = kind

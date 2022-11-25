@@ -2,7 +2,7 @@
 Implements wrappers around NumPy distributions for attaching parameters and generators.
 """
 
-from abc import ABC, abstractmethod
+from abc import ABC
 
 import numpy as np
 
@@ -115,7 +115,8 @@ class Choice(Distribution):
             If an int, the random sample is generated from np.arange(a)
         p : 1d array_like, optional
             The probabilities associated with each entry in a.
-            If not given, the sample assumes a uniform distribution over all entries in a.
+            If not given, the sample assumes a uniform distribution over
+            all entries in a.
         replace : bool
             Whether the sample is with or without replacement.
             Default is True, meaning that a value of a can be selected multiple times.
@@ -128,7 +129,8 @@ class Choice(Distribution):
 
         See Also
         --------
-        ``numpy.random.Generator.choice`` in NumPy's `documentation <https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.choice.html>`_.
+        ``numpy.random.Generator.choice`` in NumPy's
+        `documentation <https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.choice.html>`_.
         """
         if a is None:
             a = self.a
