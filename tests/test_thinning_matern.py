@@ -23,7 +23,7 @@ def test_maternThinningI(matern_input, expected):
     """Test matern thinning.
 
     `maternThinningI` takes an array of points and an array or single float
-    of radii. It returns a boolean array. Use `np.all()` to test all entries
-    are as expected.
+    of radii (a radius). The function returns a boolean array. Use `np.all()`
+    to check whether all entries are as expected.
     """
     assert np.all(thm.maternThinningI(*matern_input) == expected)
