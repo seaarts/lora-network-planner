@@ -143,3 +143,62 @@ class TestChoice:
         np_sample = rng2.choice(**numpyKwargs)
 
         assert np.all(lpd_sample == np_sample)
+
+
+# --------------------------------------
+# Test Uniform
+# --------------------------------------
+
+
+class TestUniform:
+    @pytest.mark.parametrize(
+        "prop_input, expected",
+        [
+            ({"low": 0, "high": 1, "seed": None}, (0, 1, None)),
+            ({"low": 0, "high": 1, "seed": 123}, (0, 1, 123)),
+            ({"low": [1, 1], "high": [2, 5]}, ([1, 1], [2, 5], None)),
+        ],
+    )
+    def test_properties(self, prop_input, expected):
+        unif = lpd.Uniform(**prop_input)
+        assert (unif.low, unif.high, unif.seed) == expected
+
+    @pytest.mark.parametrize(
+        "prop_input, expected",
+        [
+            ({"low": 0, "high": 1, "seed": None}, (0, 1, None)),
+            ({"low": 0, "high": 1, "seed": 123}, (0, 1, 123)),
+            ({"low": [1, 1], "high": [2, 5]}, ([1, 1], [2, 5], None)),
+        ],
+    )
+    def test_repr(self, prop_input, expected):
+        unif = lpd.Uniform(**prop_input)
+
+        data = {"low": expected[0], "high": expected[1], "seed": expected[2]}
+        text = f"UniformDistribution({data})"
+
+        assert unif.__repr__() == text
+
+    @pytest.mark.parametrize(
+        "initKwargs, callKwargs, numpyKwargs",
+        [
+            ({"low": 0, "high": 1}, {}, {"low": 0, "high": 1}),
+            ({"low": 0, "high": 1}, {"low": 5, "high": 10}, {"low": 5, "high": 10}),
+            ({"low": 0, "high": 1}, {"size": 5}, {"low": 0, "high": 1, "size": 5}),
+            (
+                {"low": 0, "high": 1},
+                {"size": [5, 3]},
+                {"low": 0, "high": 1, "size": [5, 3]},
+            ),
+        ],
+    )
+    def test_sample(self, initKwargs, callKwargs, numpyKwargs, getGenerators):
+
+        rng1, rng2 = getGenerators
+
+        unif = lpd.Uniform(**initKwargs)
+
+        lpd_sample = unif.sample(**callKwargs, seed=rng1)
+        np_sample = rng2.uniform(**numpyKwargs)
+
+        assert np.all(lpd_sample == np_sample)
