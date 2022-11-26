@@ -12,6 +12,11 @@ def getGenerators():
     return rng1, rng2
 
 
+# --------------------------------------
+# Test Normal
+# --------------------------------------
+
+
 class TestNormal:
     @pytest.mark.parametrize(
         "prop_input, expected",
@@ -66,3 +71,75 @@ class TestNormal:
         np_sample = rng2.normal(*numpyArgs)
 
         assert np.all(ldp_sample == np_sample)
+
+
+# --------------------------------------
+# Test Choice
+# --------------------------------------
+
+
+class TestChoice:
+    @pytest.mark.parametrize(
+        "prop_input, expected",
+        [
+            ({"a": 0, "p": 1, "seed": None}, (0, 1, True, None)),
+            ({"a": [0, 1], "p": None, "seed": None}, ([0, 1], None, True, None)),
+            (
+                {"a": [0, 2], "p": [0.4, 0.6], "replace": False},
+                ([0, 2], [0.4, 0.6], False, None),
+            ),
+            ({"a": [0, 1], "p": None, "seed": 123}, ([0, 1], None, True, 123)),
+            ({"a": None, "p": [1, 2], "seed": 123}, (None, [1, 2], True, 123)),
+        ],
+    )
+    def test_properties(self, prop_input, expected):
+        choice = lpd.Choice(**prop_input)
+        assert (choice.a, choice.p, choice.replace, choice.seed) == expected
+
+    @pytest.mark.parametrize(
+        "repr_input, expVals",
+        [
+            ({"a": 0, "p": 0, "seed": None}, (0, 0, True, None)),
+            ({"a": 0, "p": 0, "seed": 123}, (0, 0, True, 123)),
+            ({"a": 0, "p": 0}, (0, 0, True, None)),
+            ({"a": [0, 0], "p": 1, "replace": False}, ([0, 0], 1, False, None)),
+            ({"a": [0, 0], "p": [1, 1], "seed": None}, ([0, 0], [1, 1], True, None)),
+        ],
+    )
+    def test_repr(self, repr_input, expVals):
+        """Make a dictionary and compare."""
+        choice = lpd.Choice(**repr_input)
+        propdict = {
+            "a": expVals[0],
+            "p": expVals[1],
+            "replace": expVals[2],
+            "seed": expVals[3],
+        }
+        expected = "DiscreteDistribution(%s)" % str(propdict)
+
+        assert choice.__repr__() == expected
+
+    @pytest.mark.parametrize(
+        "initKwargs, callKwargs, numpyKwargs",
+        [
+            ({"a": [0, 1]}, {}, {"a": [0, 1]}),
+            ({"a": [0, 1], "p": [0.1, 0.9]}, {}, {"a": [0, 1], "p": [0.1, 0.9]}),
+            ({"a": [0, 1]}, {"p": [0.1, 0.9]}, {"a": [0, 1], "p": [0.1, 0.9]}),
+            ({"a": [0, 1]}, {"a": [3, 2, 4]}, {"a": [3, 2, 4]}),
+            (
+                {"a": [0, 1]},
+                {"replace": False, "size": 2},
+                {"a": [0, 1], "replace": False, "size": 2},
+            ),
+        ],
+    )
+    def test_sample(self, initKwargs, callKwargs, numpyKwargs, getGenerators):
+
+        rng1, rng2 = getGenerators
+
+        disc = lpd.Choice(**initKwargs)
+
+        lpd_sample = disc.sample(**callKwargs, seed=rng1)
+        np_sample = rng2.choice(**numpyKwargs)
+
+        assert np.all(lpd_sample == np_sample)
