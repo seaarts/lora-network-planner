@@ -198,8 +198,8 @@ class Rectangle(SpatialDomain):
 
         points = rng.uniform(0, 1, size=(nPoints, 2))  # standard uniforms
 
-        points[:, 0] *= self.width  # scale x-coordinates
-        points[:, 1] *= self.height  # scale y-coordinates
+        points[:, 0] = points[:, 0] * self.width + self.bbox[0]
+        points[:, 1] = points[:, 1] * self.height + self.bbox[1]
 
         return points
 
