@@ -203,21 +203,25 @@ class Rectangle(SpatialDomain):
 
         return points
 
-    def poisson(self, intensity, seed=None):
+    def poisson(self, intensity, seedNum=None, seedPos=None):
         """Sample a homogeneous Poisson Process over rectangle.
 
         Parameters
         ----------
         intensity: float
             The intensity of the poisson process.
-        seed : optional
+        seedNum : optional
+            Seed used to sample number of points.
+        seedPos : optional
+            Seed used to sample point positions.
         """
 
-        rng = np.random.default_rng(seed)
+        rngNum = np.random.default_rng(seedNum)
+        rngPos = np.random.default_rng(seedPos)
 
-        nPoints = rng.poisson(self.area * intensity)
+        nPoints = rngNum.poisson(self.area * intensity)
 
-        return self.uniform(nPoints, seed=seed)
+        return self.uniform(nPoints, seed=seedPos)
 
 
 class TimeWindow(SpatialDomain):
@@ -318,20 +322,24 @@ class TimeWindow(SpatialDomain):
 
         return rng.uniform(low=low, high=high, size=size)
 
-    def poisson(self, intensity, seed=None):
+    def poisson(self, intensity=1, seedNum=None, seedPos=None):
         """Sample homogeneous poisson process over window.
 
         Parameters
         ----------
         intensity : float
             Intensity or arrival rate.
-        seed : optional
+        seedNum : optional
+            Seed used to sample number of points.
+        seedPos : optional
+            Seed used to sample point positions.
         """
-        rng = np.random.default_rng(seed)
+        rngNum = np.random.default_rng(seedNum)
+        rngPos = np.random.default_rng(seedPos)
 
-        nPoints = rng.poisson(self.measure * intensity)
+        nPoints = rngNum.poisson(self.measure * intensity)
 
-        return self.uniform(nPoints, seed=seed)
+        return self.uniform(nPoints, seed=seedPos)
 
 
 class ArrivalProcess(ABC):
