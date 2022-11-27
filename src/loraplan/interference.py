@@ -20,7 +20,7 @@ from matplotlib import collections as mc
 
 from loraplan.probability import distributions as lpd
 from loraplan.probability import point_processes as lpp
-from loraplan.probability import thinning_matern
+from loraplan.probability import thinning_determinantal, thinning_matern
 
 
 def airtime(
@@ -293,7 +293,8 @@ class Traffic:
 
         See Also
         --------
-        FIX: Link to Matérn thinning and some references.
+        Our module on
+        :mod:`Matérn thinning <loraplan.probability.thinning_matern>`.
         """
         if self.nObs == 0:
             return []
@@ -317,8 +318,23 @@ class Traffic:
         the retained packets based on the model. It is assumed that the model
         exclusively uses variables that are available in the Traffic-object's
         ``self.__dict__``. If not, an error is raised.
+
+        Parameters
+        ----------
+        ensemble : loraplan.probability.determinantal_thinning.EllEnsemble
+            An L-ensemble objcet defined over variables in Traffic.
+        params : dict
+            Parameter dictionary passed to L-ensemble.
+
+        See Also
+        --------
+        Our module on
+        :mod:`determinantal thinning <loraplan.probability.thinning_determinantal>`
+        for a more detailed description.
         """
-        pass
+        if self.nObs == 0:
+            return []
+        return ensemble.sample(self.to_dict(), params)
 
     def plot(
         self, y_variable="index", labels=None, text=False, linewidths=25, **kwargs
@@ -558,7 +574,7 @@ class TrafficGenerator(ABC):
         """
         Get a sample.
         """
-        return self.sample(seed=None, **kwargs)
+        sample = self.sample(seed=None, **kwargs)
 
 
 class IndependentLoRaGenerator(TrafficGenerator):
@@ -722,4 +738,7 @@ class IndependentLoRaGenerator(TrafficGenerator):
             for i in range(N)
         ]
 
-        return sample
+        if len(sample) == 1:
+            return sample[0]
+        else:
+            return sample

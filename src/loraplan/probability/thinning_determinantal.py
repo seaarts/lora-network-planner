@@ -4,7 +4,7 @@ r"""
 Implements determinantal thinning models.
 
 A *determinantal thinning model* is a model for subset selection that
-leverages determinantal point processes. A determinantal process over
+leverages a determinantal point process. A determinantal process over
 a set :math:`X` of size :math:`n` is characterized by a p.s.d symmetric
 n-by-n matrix :math:`L` know as an *L-ensemble*. The likelihood of
 observing a subset :math:`Y\subseteq X` is given by
