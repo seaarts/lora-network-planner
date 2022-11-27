@@ -430,7 +430,7 @@ class PoissonArrivals(ArrivalProcess):
 
         if not rate and self.rate:
             rate = self.rate
-        else:
+        elif not rate:
             raise ValueError(
                 """No rate given. Try passing`rate=1.0`,\
  or set a rate for the ArrivalProcess."""

@@ -691,7 +691,7 @@ class IndependentLoRaGenerator(TrafficGenerator):
 
         return cls(arrivals, params, channelDist, spreadingDist, payloadDist, powerDist)
 
-    def sample(self, size=None, seed=None):
+    def sample(self, size=None, seed=None, **kwargs):
         """
         Sample LoRa wireless traffic.
 
@@ -708,7 +708,7 @@ class IndependentLoRaGenerator(TrafficGenerator):
 
         """
 
-        arrivals = self.arrivals.sample(size=size)
+        arrivals = self.arrivals.sample(size=size, **kwargs)
 
         N = len(arrivals)  # N can be `None` up to here
 
