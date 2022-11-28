@@ -26,6 +26,14 @@ class TestRectangle:
         assert (rect.bbox, rect.name) == expected
 
     @pytest.mark.parametrize(
+        "initKwargs", [{"bbox": [2, 2, 1, 3]}, {"bbox": [2, 2, 3, 1]}]
+    )
+    def test_invalid_attrs(self, initKwargs):
+        """Test for ValueErrors when bbox invalid."""
+        with pytest.raises(ValueError):
+            rect = lpp.Rectangle(**initKwargs)
+
+    @pytest.mark.parametrize(
         "initKwargs, expected",
         [
             ({"bbox": [0, 0, 1, 1]}, (1, 1, 1, 1)),
