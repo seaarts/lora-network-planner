@@ -337,7 +337,13 @@ class Traffic:
         return ensemble.sample(self.to_dict(), params)
 
     def plot(
-        self, y_variable="index", labels=None, text=False, linewidths=25, **kwargs
+        self,
+        y_variable="index",
+        labels=None,
+        text=False,
+        linewidths=25,
+        fontsize=10,
+        **kwargs,
     ):
         """
         Plot wireless Traffic.
@@ -403,7 +409,7 @@ class Traffic:
                 # construct text
                 text = f"ch={data['channel'][p]}, sf={data['sf'][p]}"
                 offset = +0.02 * (x_max - x_min)
-                plt.text(x + offset, y, text, color="k", fontsize=12)
+                plt.text(x + offset, y, text, color="k", fontsize=fontsize)
 
         ax.margins(0.25)
 
@@ -742,3 +748,13 @@ class IndependentLoRaGenerator(TrafficGenerator):
             return sample[0]
         else:
             return sample
+
+    def notBuffer(self, traffic):
+        """Return whether packets arrived in buffer.
+
+        Parameters
+        ----------
+        traffic : loraplan.interference.Traffic
+            Traffic object with ``start`` property indicating arrival time.
+        """
+        return self.arrivals.timeWindow.contains(traffic.start)
