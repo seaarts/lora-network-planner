@@ -114,7 +114,7 @@ class EllEnsemble:
         return self.evaluate(data, parameters)
 
     def marginalKernel(self, data, parameters):
-        """
+        r"""
         Compute the marginal kernel :math:`K`.
 
 

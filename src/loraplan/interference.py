@@ -20,7 +20,7 @@ from matplotlib import collections as mc
 
 from loraplan.probability import distributions as lpd
 from loraplan.probability import point_processes as lpp
-from loraplan.probability import thinning_determinantal, thinning_matern
+from loraplan.probability import thinning_matern
 
 
 def airtime(
@@ -109,7 +109,8 @@ def airtime(
 
     References
     ----------
-    .. [1] A. V. Bentem. "Airtime-calculator". Available at https://github.com/avbentem/airtime-calculator
+    .. [1] A. V. Bentem. "Airtime-calculator".
+    Available at https://github.com/avbentem/airtime-calculator
 
     """
 
@@ -517,7 +518,7 @@ class LoRaParameters:
 
         codingRates = {"4/5": 1, "4/6": 2, "4/7": 3, "4/8": 4}
 
-        if not codingRate in codingRates:
+        if codingRate not in codingRates:
             raise ValueError(f"Bad CodingRate. Try one of {list(codingRates.keys())}.")
 
         if spreading is None:
@@ -582,6 +583,11 @@ class TrafficGenerator(ABC):
         """
         sample = self.sample(seed=None, **kwargs)
 
+        if len(sample) == 1:
+            return sample[0]
+        else:
+            return sample
+
 
 class IndependentLoRaGenerator(TrafficGenerator):
     """
@@ -633,7 +639,7 @@ class IndependentLoRaGenerator(TrafficGenerator):
         self.powerDist = powerDist
 
     def __repr__(self):
-        out = f"IndependentLoRaGenerator("
+        out = "IndependentLoRaGenerator("
         for key, val in self.__dict__.items():
             out += f"\n\t{key}: {val}"
         out += ")"
@@ -744,10 +750,7 @@ class IndependentLoRaGenerator(TrafficGenerator):
             for i in range(N)
         ]
 
-        if len(sample) == 1:
-            return sample[0]
-        else:
-            return sample
+        return sample
 
     def notBuffer(self, traffic):
         """Return whether packets arrived in buffer.

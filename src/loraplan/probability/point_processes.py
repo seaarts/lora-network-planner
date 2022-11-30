@@ -217,7 +217,6 @@ class Rectangle(SpatialDomain):
         """
 
         rngNum = np.random.default_rng(seedNum)
-        rngPos = np.random.default_rng(seedPos)
 
         nPoints = rngNum.poisson(self.area * intensity)
 
@@ -335,7 +334,6 @@ class TimeWindow(SpatialDomain):
             Seed used to sample point positions.
         """
         rngNum = np.random.default_rng(seedNum)
-        rngPos = np.random.default_rng(seedPos)
 
         nPoints = rngNum.poisson(self.measure * intensity)
 

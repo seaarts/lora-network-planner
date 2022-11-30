@@ -7,9 +7,6 @@ Currenlty implemented are:
 
 """
 
-import collections.abc
-import warnings
-
 # from ortools.linear_solver import pywraplp
 import numpy as np
 
@@ -28,12 +25,10 @@ def _dual_update(r_resid, A_resid, f_resid, unbuilt):
     """
 
     n_dems = len(r_resid)
-    n_facs = len(f_resid)
     livings = np.where(r_resid > 0)[0]  # alive users
     unconst = np.array(list(unbuilt))  # unconstructed facilities
 
     # get relevant sub-arrays
-    reqs = r_resid[np.ix_(livings)]
     A = A_resid[np.ix_(livings, unconst)]
     f = f_resid[np.ix_(unconst)]
 
@@ -123,12 +118,10 @@ def _greedy_update(r_resid, A_resid, f_fixed, unbuilt):
     """
 
     n_dems = len(r_resid)
-    n_facs = len(f_fixed)
     livings = np.where(r_resid > 0)[0]  # alive users
     unconst = np.array(list(unbuilt))  # unconstructed facilities
 
     # get relevant sub-arrays
-    reqs = r_resid[np.ix_(livings)]
     A = A_resid[np.ix_(livings, unconst)]
     f = f_fixed[np.ix_(unconst)]
 
@@ -137,7 +130,6 @@ def _greedy_update(r_resid, A_resid, f_fixed, unbuilt):
         unit_costs = f / contributions  # unit-cost of contributions
 
     # compute minimum costs and select best facility
-    min_cost = np.min(unit_costs)  # find lowest unit cost
     best_fac = np.argmin(unit_costs)  # select lowest cost facility
     facility = unconst[best_fac]  # global index of selected facility
 
@@ -188,7 +180,7 @@ def greedy(r, A, f, eval_factor=False):
     oldcolsum = A_res.sum(axis=0)  # .copy()
     factors = []
 
-    ### main loop
+    # main loop
     while np.any(r_res > 0):
         if not bool(unbuilt):  # if no unbuilt facilities
             return np.NaN, construct, residuals

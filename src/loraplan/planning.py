@@ -8,40 +8,42 @@ programs (CIPs). A covering integer program has three main components.
 #. A set of :math:`n` **demands** denoted :math:`D`
 
     * Demands represent locations at which coverage is required.
-    
+
     * Each demand :math:`i \in D` is equipped with a *requrement* :math:`b_i > 0`.
-    
+
     * Demands may also be associated with a location in space.
-    
+
 #. A set of :math:`m` **facility locations** denoted :math:`F`
 
     * Facility locations are where where can install wireless receivers.
-    
+
     * Each facility locaiton :math:`j \in F` has a *cost* :math:`f_j`.
-    
+
     * This cost can represent the cost of hardware and installation
-    
+
     * Costs can additionaly represent amortized maintenance costs or rent
-    
+
     * A facility location naturally can also be associated with a location in space.
-    
+
     * For e.g. LoRa applications knowing the altitute is also helpful.
-    
+
 #. An :math:`n \times m` **coverage matrix** denoted :math:`A`.
 
-    * Element :math:`a_{ij}` is the coverage provided to demand :math:`i` by facility :math:`j`.
-    
-    * In the case of LoRa this is the negative log reception rate.
-    
+    * Element :math:`a_{ij}` is the coverage provided to demand
+    :math:`i` by facility :math:`j`.
 
-The covering integer problem is to install facilities at deisgnated locations such that
-every demand is sufficiently covered, while minimizing the total facility cost.
-We associate a decision vairable :math:`x_j` with each facility location. The variable
-:math:`x_j` takes value :math:`1` if we install a facility at location :math:`j \in F`,
-and :math:`0` otherwise. We only incur the facility cost :math:`f_j` when we install
-the facility at :math:`j`. Simiarly, a facility :math:`` only contributes towards demand
-:math:`i`'s requirement if it is installed. We require that the sum of contributions to
-demand :math:`i` is at least `b_i`. These is summarized in the integer progam (IP) below.
+    * In the case of LoRa this is the negative log reception rate.
+
+
+The covering integer problem is to install facilities at deisgnated locations
+such that every demand is sufficiently covered, while minimizing the total facility
+cost. We associate a decision vairable :math:`x_j` with each facility location.
+The variable :math:`x_j` takes value :math:`1` if we install a facility at location
+:math:`j \in F`, and :math:`0` otherwise. We only incur the facility cost :math:`f_j`
+when we install the facility at :math:`j`. Simiarly, a facility :math:`` only
+contributes towards demand :math:`i`'s requirement if it is installed. We require
+that the sum of contributions to demand :math:`i` is at least `b_i`.
+These are summarized in the integer progam (IP) below.
 
 .. math::
     \begin{align}
@@ -54,6 +56,10 @@ demand :math:`i` is at least `b_i`. These is summarized in the integer progam (I
 """
 
 from abc import ABC, abstractmethod
+
+import numpy as np
+from scipy.stats import norm
+from sklearn.metrics.pairwise import euclidean_distances
 
 
 class Demands:
@@ -148,7 +154,9 @@ class Facilities:
         return self.n_points()
 
 
-### Connection Quality models
+# ------------------------------------------------
+#  Connection Quality models
+# ------------------------------------------------
 
 
 class ConnectionQuality(ABC):
@@ -229,12 +237,12 @@ class LogErrorRate(ConnectionQuality):
         ::pram stdv:: scalar >0, standard deviation of gaussian noise
         """
 
-        if not issubclass(type(path_loss), LogLinearPathLoss):
-            raise ValueError("'path_loss' must be subclass of 'LogLinearPathLoss'.")
+        # if not issubclass(type(path_loss), LogLinearPathLoss):
+        #    raise ValueError("'path_loss' must be subclass of 'LogLinearPathLoss'.")
 
-        p_tx = check_scalar(p_tx, varname="p_tx")
-        p_min = check_scalar(p_min, varname="p_min")
-        stdv = check_scalar(stdv, varname="stdv")
+        # p_tx = check_scalar(p_tx, varname="p_tx")
+        # p_min = check_scalar(p_min, varname="p_min")
+        # stdv = check_scalar(stdv, varname="stdv")
 
         if stdv < 0:
             raise ValueError("'stdv' must be non-negative.")

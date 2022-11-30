@@ -70,7 +70,8 @@ class Normal(Distribution):
 
         See Also
         --------
-        `numpy.random.normal <https://numpy.org/doc/stable/reference/random/generated/numpy.random.normal.html>`_
+        `numpy.random.normal<https://numpy.org/doc/stable/reference/\
+            random/generated/numpy.random.normal.html>`_
         in the NumPy documentation .
         """
         if loc is None:
@@ -130,7 +131,8 @@ class Choice(Distribution):
         See Also
         --------
         ``numpy.random.Generator.choice`` in NumPy's
-        `documentation <https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.choice.html>`_.
+        `documentation <https://numpy.org/doc/stable/reference/\
+            random/generated/numpy.random.Generator.choice.html>`_.
         """
         if a is None:
             a = self.a
@@ -186,7 +188,8 @@ class Uniform(Distribution):
 
         See Also
         --------
-        `numpy.random.Generator.uniform <https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.uniform.html>`_
+        `numpy.random.Generator.uniform <https://numpy.org/doc/stable/\
+            reference/random/generated/numpy.random.Generator.uniform.html>`_
         in NumPy's documentation.
         """
         if low is None:
