@@ -1,17 +1,14 @@
 # loraplan - LoRa Network Planing tools
 
-.. image:: https://github.com/shunsvineyard/python-sample-code/workflows/Test/badge.svg
-    :target: https://github.com/shunsvineyard/python-sample-code/actions?query=workflow%3ATest
-
 <p align="left">
-<a href="https://github.com/seaarts/lora-network-planner/actions?query=workflow%3ATest"><img alt="Tests" src=https://github.com/seaarts/lora-network-planner/workflows/Test/badge.svg>
+<a href="https://github.com/seaarts/lora-network-planner/actions?query=workflow%2ATest"><img alt="Tests" src=https://github.com/seaarts/lora-network-planner/workflows/tests.yml/badge.svg>
 <a href="https://github.com/seaarts/lora-network-planner/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
 <a href="https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
 LoRa network planning utilities and tools in python.
 
-## Notes on making a package.
+## Notes on making a package
 - To continue with the packaging tutorial go to [this step](https://packaging.python.org/en/latest/tutorials/packaging-projects/#generating-distribution-archives)
 
 - Read about [versioning](https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#pre-release-versioning)
