@@ -4,8 +4,7 @@
 .. image:: https://github.com/seaarts/lora-network-planner/workflows/Linting/badge.svg 
     :target: https://github.com/seaarts/lora-network-planner/actions?query=workflow%3ALinting
 
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
+[!https://img.shields.io/badge/code%20style-black-000000.svg](https://github.com/psf/black)
 
 
 LoRa network planning utilities and tools in python.
