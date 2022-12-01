@@ -31,7 +31,7 @@ class TestRectangle:
     def test_invalid_attrs(self, initKwargs):
         """Test for ValueErrors when bbox invalid."""
         with pytest.raises(ValueError):
-            rect = lpp.Rectangle(**initKwargs)
+            lpp.Rectangle(**initKwargs)
 
     @pytest.mark.parametrize(
         "initKwargs, expected",
@@ -71,7 +71,8 @@ class TestRectangle:
     def test_poisson(self, initKwargs, callKwargs, getGenerators):
         """Compare shape to (Poisson(measure), 2)
 
-        This should be sufficient given ``Rectangle.area`` presumably works at this stage.
+        This should be sufficient given ``Rectangle.area``
+        presumably works at this stage.
         """
         rng1, rng2 = getGenerators
 
