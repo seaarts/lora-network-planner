@@ -1,9 +1,9 @@
-name: Tests
+name: Linting
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  lint:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -16,14 +16,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: pip install -r requirements_dev.txt
-    - name: Test with pytest
       run: |
-        pytest --cov=loraplan --cov-report=xml
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        directory: ./coverage/reports/
-        fail_ci_if_error: false
-        verbose: true
+        python -m pip install --upgrade pip
+        pip install -r requirements_dev.txt
+    - name: Format with black
+      uses: psf/black@stable
+    - name: Linting with flake8
+      run: flake8 src/
+    #- name: Type checking with mypy
+    #  run: mypy **/*.py
+    #- name: Docstring check with pydocstyle
+    #  run: pydocstyle
