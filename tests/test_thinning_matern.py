@@ -27,3 +27,18 @@ def test_maternThinningI(matern_input, expected):
     to check whether all entries are as expected.
     """
     assert np.all(thm.maternThinningI(*matern_input) == expected)
+
+
+@pytest.mark.parametrize(
+    "matern_input",
+    [
+        ([[0, 1], [0, 1]], [1], []),
+        (np.array([[0, 1], [0, 1]]), np.array([1]), []),
+        (np.array([[0, 1], [0, 1], [0, 1]]), np.array([1, 3]), []),
+        ([[0, 1], [0, 1]], [1, 3, 4, 5], []),
+    ],
+)
+def test_maternThinningIBadInput(matern_input):
+    """Test when nr points != nr radii."""
+    with pytest.raises(ValueError):
+        thm.maternThinningI(*matern_input)

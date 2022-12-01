@@ -3,15 +3,6 @@ import pytest
 
 from loraplan.probability import distributions as lpd
 
-
-@pytest.fixture
-def getGenerators():
-    seed = 11261432
-    rng1 = np.random.default_rng(seed=seed)
-    rng2 = np.random.default_rng(seed=seed)
-    return rng1, rng2
-
-
 # --------------------------------------
 # Test Normal
 # --------------------------------------
@@ -144,6 +135,31 @@ class TestChoice:
 
         assert np.all(lpd_sample == np_sample)
 
+    @pytest.mark.parametrize(
+        "initKwargs, callKwargs, numpyKwargs",
+        [
+            ({"a": [0, 1]}, {}, {"a": [0, 1]}),
+            ({"a": [0, 1], "p": [0.1, 0.9]}, {}, {"a": [0, 1], "p": [0.1, 0.9]}),
+            ({"a": [0, 1]}, {"p": [0.1, 0.9]}, {"a": [0, 1], "p": [0.1, 0.9]}),
+            ({"a": [0, 1]}, {"a": [3, 2, 4]}, {"a": [3, 2, 4]}),
+            (
+                {"a": [0, 1]},
+                {"replace": False, "size": 2},
+                {"a": [0, 1], "replace": False, "size": 2},
+            ),
+        ],
+    )
+    def test_call(self, initKwargs, callKwargs, numpyKwargs, getGenerators):
+
+        rng1, rng2 = getGenerators
+
+        disc = lpd.Choice(**initKwargs)
+
+        lpd_sample = disc(**callKwargs, seed=rng1)
+        np_sample = rng2.choice(**numpyKwargs)
+
+        assert np.all(lpd_sample == np_sample)
+
 
 # --------------------------------------
 # Test Uniform
@@ -162,6 +178,18 @@ class TestUniform:
     def test_properties(self, prop_input, expected):
         unif = lpd.Uniform(**prop_input)
         assert (unif.low, unif.high, unif.seed) == expected
+
+    @pytest.mark.parametrize(
+        "prop_input",
+        [
+            ({"low": 2, "high": 1}),
+            ({"low": 1.1, "high": 1.05}),
+            ({"low": 1.1, "high": 1.05, "seed": 123}),
+        ],
+    )
+    def test_bad_input(self, prop_input):
+        with pytest.raises(ValueError):
+            lpd.Uniform(**prop_input)
 
     @pytest.mark.parametrize(
         "prop_input, expected",
@@ -199,6 +227,30 @@ class TestUniform:
         unif = lpd.Uniform(**initKwargs)
 
         lpd_sample = unif.sample(**callKwargs, seed=rng1)
+        np_sample = rng2.uniform(**numpyKwargs)
+
+        assert np.all(lpd_sample == np_sample)
+
+    @pytest.mark.parametrize(
+        "initKwargs, callKwargs, numpyKwargs",
+        [
+            ({"low": 0, "high": 1}, {}, {"low": 0, "high": 1}),
+            ({"low": 0, "high": 1}, {"low": 5, "high": 10}, {"low": 5, "high": 10}),
+            ({"low": 0, "high": 1}, {"size": 5}, {"low": 0, "high": 1, "size": 5}),
+            (
+                {"low": 0, "high": 1},
+                {"size": [5, 3]},
+                {"low": 0, "high": 1, "size": [5, 3]},
+            ),
+        ],
+    )
+    def test_call(self, initKwargs, callKwargs, numpyKwargs, getGenerators):
+
+        rng1, rng2 = getGenerators
+
+        unif = lpd.Uniform(**initKwargs)
+
+        lpd_sample = unif(**callKwargs, seed=rng1)
         np_sample = rng2.uniform(**numpyKwargs)
 
         assert np.all(lpd_sample == np_sample)

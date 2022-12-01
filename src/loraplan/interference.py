@@ -12,6 +12,7 @@ interference. We use a ``CollisionModel`` class that takes ``Traffic``-objects
 and assigns labels to each transmission.
 """
 
+
 from abc import ABC, abstractmethod
 
 import matplotlib.pyplot as plt

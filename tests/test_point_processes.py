@@ -4,15 +4,6 @@ import pytest
 from loraplan.probability import point_processes as lpp
 
 
-@pytest.fixture
-def getGenerators():
-    """NumPy RNGs for use when testing randomness."""
-    seed = 11261432
-    rng1 = np.random.default_rng(seed=seed)
-    rng2 = np.random.default_rng(seed=seed)
-    return rng1, rng2
-
-
 class TestRectangle:
     @pytest.mark.parametrize(
         "initKwargs, expected",
