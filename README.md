@@ -1,7 +1,14 @@
-# loraplan: LoRa Network Planing tools
+# loraplan - LoRa Network Planing tools
+#######################################
+
+.. image:: https://github.com/seaarts/lora-network-planner/workflows/Linting/badge.svg 
+    :target: https://github.com/seaarts/lora-network-planner/actions?query=workflow%3ALinting
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
 
 LoRa network planning utilities and tools in python.
-
 
 ## Notes on making a package.
 - To continue with the packaging tutorial go to [this step](https://packaging.python.org/en/latest/tutorials/packaging-projects/#generating-distribution-archives)
