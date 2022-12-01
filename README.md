@@ -1,9 +1,8 @@
 # loraplan - LoRa Network Planing tools
 
-![Tests](https://github.com/seaarts/lora-network-planner/actions/workflows/tests.yml/badge.svg)
 
 <p align="left">
-<a href="https://github.com/seaarts/lora-network-planner/actions?query=workflow%2ATest"><img alt="Tests" src=https://github.com/seaarts/lora-network-planner/workflows/tests.yml/badge.svg></a>
+<a href="https://github.com/seaarts/lora-network-planner/actions?query=workflow%2ATest"><img alt="Tests" src=https://github.com/seaarts/lora-network-planner/actions/workflows/tests.yml/badge.svg></a>
 <a href="https://github.com/seaarts/lora-network-planner/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
 <a href="https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
