@@ -159,7 +159,7 @@ class Uniform(Distribution):
     def __init__(self, low=0.0, high=1.0, seed=None):
         """Instantiate finite discrete distribution."""
         if low > high:
-            raise ValueError("`low` cannot exceed high.")
+            raise ValueError("low cannot exceed high.")
 
         self.low = low
         self.high = high
